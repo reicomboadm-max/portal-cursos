@@ -657,6 +657,77 @@ export default function AdminDashboardPage() {
             />
           </div>
 
+          {/* Integração VeloraPay */}
+          <div className="p-5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-white">Integração VeloraPay</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  PIX Instantâneo
+                </span>
+              </div>
+              <label className="flex items-center gap-2 text-xs font-semibold text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={localSettings.veloraEnabled ?? true}
+                  onChange={(e) => setLocalSettings({ ...localSettings, veloraEnabled: e.target.checked })}
+                  className="rounded border-white/20 bg-surface-200 text-indigo-600 focus:ring-0"
+                />
+                <span>Ativar VeloraPay</span>
+              </label>
+            </div>
+
+            <p className="text-xs text-gray-300">
+              Receba os pagamentos via PIX diretamente na sua conta da VeloraPay (velorapay.com.br).
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">Chave da API (API Key / Token)</label>
+                <input
+                  type="password"
+                  value={localSettings.veloraApiKey || ""}
+                  onChange={(e) => setLocalSettings({ ...localSettings, veloraApiKey: e.target.value })}
+                  placeholder="vel_pk_... ou Token da API"
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">API Secret / Secret Key (Opcional)</label>
+                <input
+                  type="password"
+                  value={localSettings.veloraApiSecret || ""}
+                  onChange={(e) => setLocalSettings({ ...localSettings, veloraApiSecret: e.target.value })}
+                  placeholder="vel_sk_... (se fornecido pela Velora)"
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#090d16] border border-white/5 space-y-1.5">
+              <span className="text-[11px] font-bold text-gray-300 block">URL do Webhook para retorno automático:</span>
+              <div className="flex items-center justify-between gap-2">
+                <code className="text-[11px] text-indigo-300 font-mono break-all select-all">
+                  https://portal-cursos.vercel.app/api/webhooks/velorapay
+                </code>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText("https://portal-cursos.vercel.app/api/webhooks/velorapay");
+                    alert("URL do Webhook copiada!");
+                  }}
+                  className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold shrink-0 transition"
+                >
+                  Copiar
+                </button>
+              </div>
+              <p className="text-[10px] text-gray-400">
+                Cole essa URL no campo de Webhooks dentro do seu painel da VeloraPay para aprovação automática.
+              </p>
+            </div>
+          </div>
+
           <button
             type="submit"
             className="w-full py-3.5 px-4 rounded-xl font-bold text-xs bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/30 transition flex items-center justify-center gap-2 cursor-pointer"

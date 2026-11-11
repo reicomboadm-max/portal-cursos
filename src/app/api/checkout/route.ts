@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getCourseBySlug, COURSES } from "@/lib/data";
+import { COURSES } from "@/lib/data";
+import { createVeloraPixPayment } from "@/lib/velorapay";
 import type { Order } from "@/types";
 
 export async function POST(req: Request) {
@@ -13,12 +14,29 @@ export async function POST(req: Request) {
     }
 
     // Validar e-mail Gmail para acesso ao Drive
-    if (!email.includes("@gmail.com")) {
-      return NextResponse.json({ error: "E-mail Gmail é obrigatório para acesso ao Drive" }, { status: 400 });
+    if (!email || !email.includes("@gmail.com")) {
+      return NextResponse.json(
+        { error: "E-mail Gmail é obrigatório para liberação da pasta no Google Drive" },
+        { status: 400 }
+      );
     }
 
+    const orderId = `ORD-${Date.now()}`;
+
+    // Gerar pagamento PIX via VeloraPay
+    const veloraResponse = await createVeloraPixPayment({
+      amount: course.price,
+      orderId,
+      description: `Acesso Drive 2026: ${course.title}`,
+      customer: {
+        name: nome,
+        email: email,
+        phone: whatsapp || "",
+      },
+    });
+
     const order: Order = {
-      id: `ORD-${Date.now()}`,
+      id: orderId,
       studentName: nome,
       studentEmail: email,
       studentWhatsapp: whatsapp,
@@ -28,21 +46,25 @@ export async function POST(req: Request) {
       amount: course.price,
       paymentMethod: "PIX",
       status: "PENDING",
-      pixCopyPaste: `00020126580014BR.GOV.BCB.PIX0136${Date.now()}5204000053039865405${course.price.toFixed(2)}5802BR59${nome.length}${nome}6009Sao Paulo62290525MERCADO PAGO:ID${Date.now()}6304`,
+      pixCopyPaste: veloraResponse.pixCopiaECola,
+      pixQrCodeUrl: veloraResponse.qrCodeUrl || veloraResponse.qrCodeBase64,
       driveUrl: course.driveUrl,
       createdAt: new Date().toISOString(),
+      veloraTransactionId: veloraResponse.transactionId,
     };
 
-    // Em produção, salvar no banco e gerar QR Code PIX real
     return NextResponse.json({
       success: true,
       orderId: order.id,
       pixCopyPaste: order.pixCopyPaste,
+      qrCode: order.pixQrCodeUrl,
+      transactionId: order.veloraTransactionId,
       amount: order.amount,
-      message: "Pedido criado com sucesso. Aguarde confirmação do pagamento.",
+      gateway: "VeloraPay",
+      message: "PIX gerado via VeloraPay. Efetue o pagamento para liberação do Drive.",
     });
   } catch (err) {
-    return NextResponse.json({ error: "Erro ao gerar pagamento" }, { status: 500 });
+    console.error("Erro no checkout:", err);
+    return NextResponse.json({ error: "Erro ao gerar pagamento PIX" }, { status: 500 });
   }
 }
-

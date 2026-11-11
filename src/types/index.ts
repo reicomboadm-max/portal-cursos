@@ -47,6 +47,7 @@ export interface Order {
   paidAt?: string;
   deliveredAt?: string;
   deliveryEstimatedMax?: string; // Data limite (24h)
+  veloraTransactionId?: string;
 }
 
 export interface StudentUser {
@@ -72,4 +73,8 @@ export interface SiteSettings {
   bannerNotice: string;
   deliveryTimeNotice: string; // Ex: "Envio em até 24 horas após confirmação do PIX"
   allowSelfRegistration: boolean;
+  veloraEnabled?: boolean;
+  veloraApiKey?: string;
+  veloraApiSecret?: string;
+  veloraWebhookSecret?: string;
 }

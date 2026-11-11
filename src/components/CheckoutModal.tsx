@@ -198,6 +198,11 @@ export function CheckoutModal() {
               />
             </div>
 
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-gray-400 pt-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Processado com segurança via <strong className="text-white font-semibold">VeloraPay</strong> • PIX Instantâneo</span>
+            </div>
+
             {/* Submit button */}
             <button
               type="submit"
