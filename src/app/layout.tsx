@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { SITE_SETTINGS } from "@/lib/data";
+import "./globals.css";
+import { StoreProvider } from "@/context/StoreContext";
 
 export const metadata: Metadata = {
-  title: SITE_SETTINGS.siteName,
-  description: SITE_SETTINGS.tagline,
+  title: "DriveConcursos VIP • Pastas de Cursos no Google Drive",
+  description: "Os melhores materiais para concursos em pastas do Google Drive com envio no seu Gmail em até 24 horas após o pagamento via PIX.",
 };
 
 export default function RootLayout({
@@ -14,9 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR">
-      <body className="bg-surface-100 text-white antialiased selection:bg-brand-500 selection:text-white">
-        {children}
+    <html lang="pt-BR" className="dark">
+      <body className="bg-[#07090e] text-white antialiased selection:bg-indigo-500 selection:text-white min-h-screen">
+        <StoreProvider>
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );

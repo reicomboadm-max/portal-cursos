@@ -33,3 +33,4 @@ Edite `src/lib/data.ts` com:
 - Chave PIX e dados do beneficiário
 - IDs das pastas do Google Drive
 - E-mails dos administradores
+
