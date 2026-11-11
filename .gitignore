@@ -1,0 +1,17 @@
+node_modules/
+.next/
+.env.local
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.DS_Store
+.turbo/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+coverage/
+.vercel/
+*.zip
