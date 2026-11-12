@@ -15,7 +15,7 @@ export const SITE_SETTINGS: SiteSettings = {
   allowSelfRegistration: true,
   veloraEnabled: true,
   veloraApiKey: "0f9aefdb-e37e-45a8-a069-9780bdac8734",
-  veloraApiSecret: "",
+  veloraApiSecret: "808e2573-286a-4559-9fb5-d5ef11a755cf",
   veloraWebhookSecret: "b17ce96282830488fbb6935a7b6782791",
 };
 

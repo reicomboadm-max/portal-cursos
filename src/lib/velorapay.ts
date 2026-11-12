@@ -24,6 +24,7 @@ export interface VeloraPixResponse {
 
 export const VELORA_CONFIG = {
   apiKey: "0f9aefdb-e37e-45a8-a069-9780bdac8734",
+  apiSecret: "808e2573-286a-4559-9fb5-d5ef11a755cf",
   webhookSecret: "b17ce96282830488fbb6935a7b6782791",
   baseUrl: "https://api.velorapay.com.br",
 };
@@ -33,7 +34,7 @@ export async function createVeloraPixPayment(
   config?: { apiKey?: string; apiSecret?: string; baseUrl?: string }
 ): Promise<VeloraPixResponse> {
   const apiKey = config?.apiKey || process.env.VELORAPAY_API_KEY || VELORA_CONFIG.apiKey;
-  const apiSecret = config?.apiSecret || process.env.VELORAPAY_API_SECRET || "";
+  const apiSecret = config?.apiSecret || process.env.VELORAPAY_API_SECRET || VELORA_CONFIG.apiSecret;
   const baseUrl = config?.baseUrl || process.env.VELORAPAY_BASE_URL || VELORA_CONFIG.baseUrl;
 
   // Formatar documento (CPF de 11 dígitos ou padrão válido)
