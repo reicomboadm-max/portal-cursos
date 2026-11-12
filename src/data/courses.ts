@@ -14,8 +14,8 @@ export const initialSiteSettings: SiteSettings = {
   deliveryTimeNotice: "Envio do acesso ao Google Drive em até 24 horas após a confirmação do pagamento",
   allowSelfRegistration: true,
   veloraEnabled: true,
-  veloraApiKey: "0f9aefdb-e37e-45a8-a069-9780bdac8734",
-  veloraApiSecret: "808e2573-286a-4559-9fb5-d5ef11a755cf",
+  veloraApiKey: "vl_live_sk_232b3775033a405b872c4955940c4a27",
+  veloraApiSecret: "bb958b13-2902-46ce-b5ea-fa2293ed6a58",
   veloraWebhookSecret: "b17ce96282830488fbb6935a7b6782791",
 };
 

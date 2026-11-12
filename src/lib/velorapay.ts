@@ -23,8 +23,8 @@ export interface VeloraPixResponse {
 }
 
 export const VELORA_CONFIG = {
-  apiKey: "0f9aefdb-e37e-45a8-a069-9780bdac8734",
-  apiSecret: "808e2573-286a-4559-9fb5-d5ef11a755cf",
+  apiKey: "vl_live_sk_232b3775033a405b872c4955940c4a27",
+  apiSecret: "bb958b13-2902-46ce-b5ea-fa2293ed6a58",
   webhookSecret: "b17ce96282830488fbb6935a7b6782791",
   baseUrl: "https://api.velorapay.com.br",
 };
@@ -63,11 +63,12 @@ export async function createVeloraPixPayment(
     });
 
     if (response.ok) {
-      const data = await response.json();
-      console.log("✅ [VeloraPay PIX Gerado com Sucesso]:", data);
+      const jsonResponse = await response.json();
+      console.log("✅ [VeloraPay PIX Gerado com Sucesso]:", jsonResponse);
 
-      const pixString = data.pix_copy_paste || data.emv || data.qrcode_text || data.pix || data.code || "";
-      let qrBase64 = data.qrcode_base64 || data.qr_code || data.qrcode || "";
+      const resData = jsonResponse.data || jsonResponse;
+      const pixString = resData.copyPaste || resData.pix_copy_paste || resData.emv || resData.qrcode_text || resData.pix || resData.code || "";
+      let qrBase64 = resData.qrCodeBase64 || resData.qrcodeUrl || resData.qrcode_base64 || resData.qr_code || resData.qrcode || "";
 
       // Se a Velora retornar apenas a string Copia e Cola, nós geramos a imagem do QR Code
       if (pixString && !qrBase64) {
@@ -84,12 +85,12 @@ export async function createVeloraPixPayment(
 
       return {
         success: true,
-        transactionId: String(data.id || data.transaction_id || data.payment_id || `vel_${Date.now()}`),
+        transactionId: String(resData.transactionId || resData.id || resData.externalId || `vel_${Date.now()}`),
         pixCopiaECola: pixString,
         qrCodeBase64: qrBase64,
-        qrCodeUrl: data.qrcode_url || qrBase64,
-        expiresAt: data.expires_at,
-        raw: data,
+        qrCodeUrl: qrBase64,
+        expiresAt: resData.expires_at || resData.expiresAt,
+        raw: jsonResponse,
       };
     } else {
       const errText = await response.text();
