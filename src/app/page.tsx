@@ -9,15 +9,15 @@ import { CheckoutModal } from "@/components/CheckoutModal";
 import { Testimonials } from "@/components/Testimonials";
 import { FaqSection } from "@/components/FaqSection";
 import Footer from "@/components/Footer";
-import { 
-  FolderLock, 
-  Sparkles, 
-  Clock, 
-  CheckCircle2, 
-  Zap, 
-  Download, 
-  ShieldCheck, 
-  Star, 
+import {
+  FolderLock,
+  Sparkles,
+  Clock,
+  CheckCircle2,
+  Zap,
+  Download,
+  ShieldCheck,
+  Star,
   HardDrive,
   FileText,
   Video,
@@ -26,11 +26,19 @@ import {
   Check,
   Users,
   Award,
-  Flame
+  Flame,
+  MessageCircle,
+  Send,
+  TrendingUp,
+  Lock,
+  BadgeCheck
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { TextType } from "@/components/reactbits/TextType";
 import { ShinyText } from "@/components/reactbits/ShinyText";
+import { ScrollReveal } from "@/components/reactbits/ScrollReveal";
+import { Marquee } from "@/components/reactbits/Marquee";
+import { GradientText } from "@/components/reactbits/GradientText";
 
 export default function HomePage() {
   const { 
@@ -67,55 +75,65 @@ export default function HomePage() {
       {/* Animated Stats Section */}
       <section className="py-12 border-t border-white/5 bg-[#090e1b]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <ShinyText text="Números que falam" className="text-2xl sm:text-3xl font-black mb-3" />
-            <p className="text-sm text-gray-400">Nosso acervo em números para você confiar</p>
-          </div>
+          <ScrollReveal delay={0} duration={800} distance="30px" origin="bottom">
+            <div className="text-center mb-10">
+              <ShinyText text="Números que falam" className="text-2xl sm:text-3xl font-black mb-3" />
+              <p className="text-sm text-gray-400">Nosso acervo em números para você confiar</p>
+            </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-4">
-                <Flame className="w-5 h-5" />
+            <ScrollReveal delay={100} duration={700} distance="30px" origin="bottom">
+              <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-4">
+                  <Flame className="w-5 h-5" />
+                </div>
+                <TextType
+                  words={["500+", "600+", "700+"]}
+                  className="text-3xl sm:text-4xl font-black text-white mb-1"
+                />
+                <p className="text-xs text-gray-400">cursos no acervo VIP</p>
               </div>
-              <TextType
-                words={["500+", "600+", "700+"]}
-                className="text-3xl sm:text-4xl font-black text-white mb-1"
-              />
-              <p className="text-xs text-gray-400">cursos no acervo VIP</p>
-            </div>
+            </ScrollReveal>
 
-            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
-              <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto mb-4">
-                <Users className="w-5 h-5" />
+            <ScrollReveal delay={200} duration={700} distance="30px" origin="bottom">
+              <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+                <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-5 h-5" />
+                </div>
+                <TextType
+                  words={["12.000+", "15.000+", "18.000+"]}
+                  className="text-3xl sm:text-4xl font-black text-white mb-1"
+                />
+                <p className="text-xs text-gray-400">alunos aprovados com nossos drives</p>
               </div>
-              <TextType
-                words={["12.000+", "15.000+", "18.000+"]}
-                className="text-3xl sm:text-4xl font-black text-white mb-1"
-              />
-              <p className="text-xs text-gray-400">alunos aprovados com nossos drives</p>
-            </div>
+            </ScrollReveal>
 
-            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-4">
-                <Award className="w-5 h-5" />
+            <ScrollReveal delay={300} duration={700} distance="30px" origin="bottom">
+              <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-4">
+                  <Award className="w-5 h-5" />
+                </div>
+                <TextType
+                  words={["98%", "99%", "100%"]}
+                  className="text-3xl sm:text-4xl font-black text-white mb-1"
+                />
+                <p className="text-xs text-gray-400">taxa de entrega em até 24h</p>
               </div>
-              <TextType
-                words={["98%", "99%", "100%"]}
-                className="text-3xl sm:text-4xl font-black text-white mb-1"
-              />
-              <p className="text-xs text-gray-400">taxa de entrega em até 24h</p>
-            </div>
+            </ScrollReveal>
 
-            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck className="w-5 h-5" />
+            <ScrollReveal delay={400} duration={700} distance="30px" origin="bottom">
+              <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <TextType
+                  words={["24h", "12h", "6h"]}
+                  className="text-3xl sm:text-4xl font-black text-white mb-1"
+                />
+                <p className="text-xs text-gray-400">tempo médio de liberação de acesso</p>
               </div>
-              <TextType
-                words={["24h", "12h", "6h"]}
-                className="text-3xl sm:text-4xl font-black text-white mb-1"
-              />
-              <p className="text-xs text-gray-400">tempo médio de liberação de acesso</p>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -123,25 +141,57 @@ export default function HomePage() {
       {/* Urgency Banner */}
       <section className="py-8 bg-gradient-to-r from-indigo-950/80 to-purple-950/80 border border-indigo-500/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl border border-white/10 bg-[#07090e]/60 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
-                <Clock className="w-5 h-5" />
+          <ScrollReveal delay={0} duration={800} distance="30px" origin="bottom">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl border border-white/10 bg-[#07090e]/60 backdrop-blur-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-sm sm:text-base">Oferta por tempo limitado</h3>
+                  <p className="text-xs text-gray-400">Super combos com preço promocional até o próximo edital</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-white text-sm sm:text-base">Oferta por tempo limitado</h3>
-                <p className="text-xs text-gray-400">Super combos com preço promocional até o próximo edital</p>
+              <div className="flex items-center gap-3 text-right sm:text-left">
+                <GradientText colors={["#fbbf24", "#f59e0b", "#d97706"]} speed={2} className="text-2xl sm:text-3xl font-black">
+                  R$ 89,90
+                </GradientText>
+                <span className="text-xs text-gray-400 block sm:inline">Pagamento único via PIX</span>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-right sm:text-left">
-              <TextType
-                words={["R$ 89,90", "R$ 79,90", "R$ 69,90"]}
-                typingSpeed={60}
-                className="text-2xl sm:text-3xl font-black text-amber-400"
-              />
-              <span className="text-xs text-gray-400 block sm:inline">Pagamento único via PIX</span>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Trust Badges Marquee */}
+      <section className="py-6 border-y border-white/5 bg-[#07090e]/50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Marquee speed={30} direction="left" gap="6rem" pauseOnHover>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 whitespace-nowrap">
+              <BadgeCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Entrega Garantida 24h</span>
             </div>
-          </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 whitespace-nowrap">
+              <Lock className="w-4 h-4 text-indigo-400 shrink-0" />
+              <span>PIX Criptografado</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 whitespace-nowrap">
+              <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+              <span>Acesso Vitalício</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 whitespace-nowrap">
+              <Download className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Download 100% Liberado</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 whitespace-nowrap">
+              <TrendingUp className="w-4 h-4 text-purple-400 shrink-0" />
+              <span>Atualizações 2026 Inclusas</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-gray-400 whitespace-nowrap">
+              <MessageCircle className="w-4 h-4 text-sky-400 shrink-0" />
+              <span>Suporte WhatsApp/Telegram</span>
+            </div>
+          </Marquee>
         </div>
       </section>
 
@@ -149,29 +199,31 @@ export default function HomePage() {
       <main id="cursos" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Acervo Selecionado 2026</span>
+        <ScrollReveal delay={0} duration={700} distance="30px" origin="bottom">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>Acervo Selecionado 2026</span>
+              </div>
+              <GradientText colors={["#6366f1", "#06b6d4", "#a855f7"]} speed={3} className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                {activeSegmentFilter === "fiscal" && "🏛️ Cursos da Área Fiscal (Receita, SEFAZ, ISS)"}
+                {activeSegmentFilter === "tribunais" && "⚖️ Cursos para Tribunais (TJ, TRT, TRF, TSE)"}
+                {activeSegmentFilter === "combos" && "⭐ Super Combos Passaporte VIP"}
+                {activeSegmentFilter === "todos" && "Todos os Cursos Disponíveis para Envio"}
+              </GradientText>
+              <p className="text-sm text-gray-400 mt-1">
+                Selecione o seu curso e receba o convite de acesso compartilhado no seu Gmail em até 24 horas.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              {activeSegmentFilter === "fiscal" && "🏛️ Cursos da Área Fiscal (Receita, SEFAZ, ISS)"}
-              {activeSegmentFilter === "tribunais" && "⚖️ Cursos para Tribunais (TJ, TRT, TRF, TSE)"}
-              {activeSegmentFilter === "combos" && "⭐ Super Combos Passaporte VIP"}
-              {activeSegmentFilter === "todos" && "Todos os Cursos Disponíveis para Envio"}
-            </h2>
-            <p className="text-sm text-gray-400 mt-1">
-              Selecione o seu curso e receba o convite de acesso compartilhado no seu Gmail em até 24 horas.
-            </p>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-gray-300">
-              {filteredCourses.length} {filteredCourses.length === 1 ? "curso encontrado" : "cursos encontrados"}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-gray-300">
+                {filteredCourses.length} {filteredCourses.length === 1 ? "curso encontrado" : "cursos encontrados"}
+              </span>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Empty state when search returns zero */}
         {filteredCourses.length === 0 ? (
@@ -195,8 +247,9 @@ export default function HomePage() {
           </div>
         ) : (
           /* Cards Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => {
+          <ScrollReveal delay={100} duration={800} distance="30px" origin="bottom">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCourses.map((course) => {
               const isFiscal = course.segment === "fiscal";
               const isCombo = course.segment === "combos";
               
@@ -313,6 +366,7 @@ export default function HomePage() {
               );
             })}
           </div>
+        </ScrollReveal>
         )}
 
       </main>
@@ -320,20 +374,22 @@ export default function HomePage() {
       {/* Benefits Section: Por que nossos drives? */}
       <section id="como-funciona" className="py-16 border-t border-white/5 bg-[#090e1b]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
-              Diferenciais do Nosso Acervo
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mt-3">
-              Por que estudar com os nossos drives?
-            </h2>
-            <p className="mt-3 text-sm sm:text-base text-gray-300">
-              Economize milhares de reais tendo acesso aos melhores materiais de concurso público do país.
-            </p>
-          </div>
+          <ScrollReveal delay={0} duration={700} distance="30px" origin="bottom">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
+                Diferenciais do Nosso Acervo
+              </span>
+              <GradientText colors={["#6366f1", "#06b6d4", "#a855f7"]} speed={3} className="text-2xl sm:text-4xl font-extrabold tracking-tight mt-3">
+                Por que estudar com os nossos drives?
+              </GradientText>
+              <p className="mt-3 text-sm sm:text-base text-gray-300">
+                Economize milhares de reais tendo acesso aos melhores materiais de concurso público do país.
+              </p>
+            </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ScrollReveal delay={100} duration={800} distance="30px" origin="bottom">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5">
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20">
@@ -376,17 +432,22 @@ export default function HomePage() {
             </div>
 
           </div>
+          </ScrollReveal>
 
         </div>
       </section>
 
       {/* Testimonials */}
-      <Testimonials />
+      <ScrollReveal delay={0} duration={700} distance="30px" origin="bottom">
+        <Testimonials />
+      </ScrollReveal>
 
       {/* FAQ */}
-      <div id="faq">
-        <FaqSection />
-      </div>
+      <ScrollReveal delay={100} duration={700} distance="30px" origin="bottom">
+        <div id="faq">
+          <FaqSection />
+        </div>
+      </ScrollReveal>
 
       {/* Footer */}
       <Footer />

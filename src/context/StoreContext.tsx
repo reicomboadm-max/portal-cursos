@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import QRCode from "qrcode";
 import { Course, Order, OrderStatus, SiteSettings, StudentUser, SegmentType } from "@/types";
 import { initialCourses, initialOrders, initialSiteSettings } from "@/data/courses";
@@ -47,6 +47,10 @@ interface StoreContextType {
   updateSettings: (newSettings: Partial<SiteSettings>) => void;
   loginAsStudent: (email: string, name?: string) => StudentUser;
   logout: () => void;
+  // Admin & Real-time
+  isAdmin: boolean;
+  refreshOrdersFromServer: () => Promise<void>;
+  lastOrderUpdate: number;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -65,6 +69,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [activeSegmentFilter, setActiveSegmentFilter] = useState<SegmentType | "todos">("todos");
   const [searchQuery, setSearchQuery] = useState("");
   const [isHydrated, setIsHydrated] = useState(false);
+  const [lastOrderUpdate, setLastOrderUpdate] = useState<number>(Date.now());
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  // Admin detection
+  const isAdmin = currentUser?.role === "admin" || 
+    (currentUser && settings.adminEmails.some(e => e.toLowerCase() === currentUser.email.toLowerCase()));
 
   // Load from localStorage on client mount
   useEffect(() => {
@@ -138,6 +148,59 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentUser, isHydrated]);
 
+  // Real-time SSE connection for order updates (admin only)
+  useEffect(() => {
+    if (!isAdmin || typeof window === "undefined") return;
+
+    const es = new EventSource("/api/orders/stream");
+    eventSourceRef.current = es;
+
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "ORDER_UPDATE" && data.order) {
+          setOrders((prev) => {
+            const exists = prev.find(o => o.id === data.order.id);
+            if (exists) {
+              return prev.map(o => o.id === data.order.id ? data.order : o);
+            } else {
+              return [data.order, ...prev];
+            }
+          });
+          setLastOrderUpdate(Date.now());
+        } else if (data.type === "ORDERS_SYNC" && Array.isArray(data.orders)) {
+          setOrders(data.orders);
+          setLastOrderUpdate(Date.now());
+        }
+      } catch (e) {
+        console.error("SSE parse error:", e);
+      }
+    };
+
+    es.onerror = () => {
+      console.warn("SSE connection lost, will retry...");
+    };
+
+    return () => {
+      es.close();
+      eventSourceRef.current = null;
+    };
+  }, [isAdmin]);
+
+  // Refresh orders from server (for admin dashboard polling fallback)
+  const refreshOrdersFromServer = useCallback(async () => {
+    try {
+      const res = await fetch("/api/orders", { cache: "no-store" });
+      if (res.ok) {
+        const serverOrders = await res.json();
+        setOrders(serverOrders);
+        setLastOrderUpdate(Date.now());
+      }
+    } catch (e) {
+      console.error("Failed to refresh orders:", e);
+    }
+  }, []);
+
   const openCheckout = (course: Course) => {
     setSelectedCourseForCheckout(course);
   };
@@ -151,12 +214,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     studentName: string;
     studentEmail: string;
     studentWhatsapp?: string;
+    studentCpf?: string;
   }): Promise<Order> => {
     const course = courses.find((c) => c.id === data.courseId);
     if (!course) throw new Error("Curso não encontrado.");
 
-    const orderId = `ORD-${Math.floor(10000 + Math.random() * 90000)}`;
-
+    let orderId = "";
     let pixCopyPaste = "";
     let qrCodeUrl = "";
     let transactionId = "";
@@ -180,12 +243,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
       if (res.ok) {
         const json = await res.json();
+        if (json.orderId) orderId = json.orderId;
         if (json.pixCopyPaste) pixCopyPaste = json.pixCopyPaste;
         if (json.qrCode) qrCodeUrl = json.qrCode;
         if (json.transactionId) transactionId = json.transactionId;
       }
     } catch (apiErr) {
       console.warn("Could not reach /api/checkout, using fallback generator", apiErr);
+    }
+
+    // Fallback: generate orderId if API failed
+    if (!orderId) {
+      orderId = `ORD-${Math.floor(10000 + Math.random() * 90000)}`;
     }
 
     if (!pixCopyPaste) {
@@ -223,6 +292,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       studentName: data.studentName.trim(),
       studentEmail: data.studentEmail.trim().toLowerCase(),
       studentWhatsapp: data.studentWhatsapp?.trim(),
+      studentCpf: data.studentCpf?.trim(),
       courseId: course.id,
       courseTitle: course.title,
       courseSegment: course.segment,
@@ -410,6 +480,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         updateSettings,
         loginAsStudent,
         logout,
+        isAdmin,
+        refreshOrdersFromServer,
+        lastOrderUpdate,
       }}
     >
       {children}

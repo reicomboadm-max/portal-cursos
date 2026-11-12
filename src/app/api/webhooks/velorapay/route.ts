@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import { VELORA_CONFIG } from "@/lib/velorapay";
 import { orderStore } from "@/lib/orderStore";
 
+// Função para sincronizar com localStorage do cliente via cookie/header
+async function syncWithClientStorage(orderId: string, status: string) {
+  // O webhook não tem acesso direto ao localStorage do cliente
+  // Mas podemos tentar notificar via Server-Sent Events ou webhook de volta
+  // Por enquanto, o polling no CheckoutModal já verifica o orderStore
+  // e atualiza o StoreContext via updateOrderStatus
+  console.log(`[Webhook] Order ${orderId} marked as ${status} in orderStore`);
+}
+
 export async function POST(req: Request) {
   try {
     const rawBody = await req.text();
@@ -26,20 +35,22 @@ export async function POST(req: Request) {
     const transactionId = payload.id || payload.transaction_id || payload.payment_id;
 
     // Verificar se o evento é de pagamento confirmado
-    const isApproved = 
-      event === "payment.confirmed" || 
-      event === "payment.paid" || 
-      event.includes("paid") || 
-      event.includes("confirmed") || 
+    const isApproved =
+      event === "payment.confirmed" ||
+      event === "payment.paid" ||
+      event.includes("paid") ||
+      event.includes("confirmed") ||
       event.includes("settled");
 
     if (isApproved) {
       console.log(`✅ [VeloraPay] Pagamento APROVADO! Pedido: ${externalId} | Transação: ${transactionId}`);
       if (externalId) {
         orderStore.markPaid(externalId, { amount: payload.amount });
+        await syncWithClientStorage(externalId, "PAID");
       }
       if (transactionId) {
         orderStore.markPaid(transactionId, { amount: payload.amount });
+        await syncWithClientStorage(transactionId, "PAID");
       }
     }
 

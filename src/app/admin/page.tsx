@@ -16,6 +16,7 @@ import {
   Search, 
   CheckCircle2, 
   XCircle, 
+  X,
   Copy, 
   ExternalLink, 
   MessageCircle, 
@@ -206,7 +207,7 @@ export default function AdminDashboardPage() {
       folderSize: editForm.folderSize,
       totalFiles: editForm.totalFiles,
       coverGradient: editForm.coverGradient,
-      active: editForm.active === "true",
+      active: Boolean(editForm.active),
       updatedAt: new Date().toISOString(),
     } as Partial<Course> & { segment: SegmentType };
 
@@ -233,7 +234,7 @@ export default function AdminDashboardPage() {
         folderSize: editForm.folderSize || "0 GB",
         totalFiles: editForm.totalFiles || "0 Arquivos",
         updatedAt: new Date().toISOString(),
-        active: editForm.active === "true",
+        active: Boolean(editForm.active),
         coverGradient: editForm.coverGradient || "from-indigo-600 to-purple-600",
         stockStatus: "in_stock",
       };

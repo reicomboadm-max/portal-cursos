@@ -34,6 +34,7 @@ export interface Order {
   studentName: string;
   studentEmail: string; // Gmail informado para envio
   studentWhatsapp?: string;
+  studentCpf?: string;
   courseId: string;
   courseTitle: string;
   courseSegment: SegmentType;
