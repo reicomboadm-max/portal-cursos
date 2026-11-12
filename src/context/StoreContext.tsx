@@ -142,27 +142,57 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     const orderId = `ORD-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    const pixPayload = generatePixPayload({
-      pixKey: settings.pixKey,
-      beneficiaryName: settings.beneficiaryName,
-      beneficiaryCity: settings.beneficiaryCity,
-      amount: course.price,
-      txid: orderId.replace("-", ""),
-      description: course.title.slice(0, 25),
-    });
-
+    let pixCopyPaste = "";
     let qrCodeUrl = "";
+    let transactionId = "";
+
     try {
-      qrCodeUrl = await QRCode.toDataURL(pixPayload, {
-        margin: 2,
-        width: 320,
-        color: {
-          dark: "#0b0f19",
-          light: "#ffffff",
-        },
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseId: course.id,
+          nome: data.studentName.trim(),
+          email: data.studentEmail.trim().toLowerCase(),
+          whatsapp: data.studentWhatsapp?.trim() || "",
+        }),
       });
-    } catch (err) {
-      console.error("QR Code generation error:", err);
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.pixCopyPaste) pixCopyPaste = json.pixCopyPaste;
+        if (json.qrCode) qrCodeUrl = json.qrCode;
+        if (json.transactionId) transactionId = json.transactionId;
+      }
+    } catch (apiErr) {
+      console.warn("Could not reach /api/checkout, using fallback generator", apiErr);
+    }
+
+    if (!pixCopyPaste) {
+      const pixPayloadFallback = generatePixPayload({
+        pixKey: settings.pixKey,
+        beneficiaryName: settings.beneficiaryName,
+        beneficiaryCity: settings.beneficiaryCity,
+        amount: course.price,
+        txid: orderId.replace("-", ""),
+        description: course.title.slice(0, 25),
+      });
+      pixCopyPaste = pixPayloadFallback;
+    }
+
+    if (!qrCodeUrl && pixCopyPaste) {
+      try {
+        qrCodeUrl = await QRCode.toDataURL(pixCopyPaste, {
+          margin: 2,
+          width: 320,
+          color: {
+            dark: "#0b0f19",
+            light: "#ffffff",
+          },
+        });
+      } catch (err) {
+        console.error("QR Code generation error:", err);
+      }
     }
 
     // 24 hours from now
@@ -179,11 +209,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       amount: course.price,
       paymentMethod: "PIX",
       status: "PENDING",
-      pixCopyPaste: pixPayload,
+      pixCopyPaste: pixCopyPaste,
       pixQrCodeUrl: qrCodeUrl,
       driveUrl: course.driveUrl,
       createdAt: new Date().toISOString(),
       deliveryEstimatedMax: deliveryMax,
+      veloraTransactionId: transactionId,
     };
 
     setOrders((prev) => [newOrder, ...prev]);

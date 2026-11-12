@@ -13,6 +13,10 @@ export const initialSiteSettings: SiteSettings = {
   bannerNotice: "🔥 Drives 100% atualizados para 2026 • Envio do link para o seu Gmail em até 24 horas após o PIX!",
   deliveryTimeNotice: "Envio do acesso ao Google Drive em até 24 horas após a confirmação do pagamento",
   allowSelfRegistration: true,
+  veloraEnabled: true,
+  veloraApiKey: "0f9aefdb-e37e-45a8-a069-9780bdac8734",
+  veloraApiSecret: "",
+  veloraWebhookSecret: "b17ce96282830488fbb6935a7b6782791",
 };
 
 export const initialCourses: Course[] = [

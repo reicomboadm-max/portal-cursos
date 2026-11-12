@@ -1,35 +1,59 @@
 import { NextResponse } from "next/server";
+import { VELORA_CONFIG } from "@/lib/velorapay";
 
 export async function POST(req: Request) {
   try {
-    const payload = await req.json();
-    console.log("🔔 [VeloraPay Webhook Recebido]:", JSON.stringify(payload, null, 2));
+    const rawBody = await req.text();
+    const signature = req.headers.get("x-velorapay-signature") || req.headers.get("x-signature") || "";
 
-    // A VeloraPay geralmente envia status como 'paid', 'completed', 'approved' ou 'settled'
-    const status = (payload.status || payload.event || "").toLowerCase();
+    let payload: any = {};
+    try {
+      payload = JSON.parse(rawBody);
+    } catch {
+      payload = {};
+    }
+
+    console.log("🔔 [VeloraPay Webhook Recebido]:", {
+      event: payload.event || payload.type || payload.status,
+      id: payload.id || payload.transaction_id,
+      amount: payload.amount,
+      signature: signature ? "presente" : "ausente",
+    });
+
+    const event = (payload.event || payload.status || payload.type || "").toLowerCase();
     const externalId = payload.external_id || payload.order_id || payload.custom_id;
-    const transactionId = payload.id || payload.transaction_id;
+    const transactionId = payload.id || payload.transaction_id || payload.payment_id;
 
-    if (status.includes("paid") || status.includes("settled") || status.includes("approved")) {
-      console.log(`✅ Pagamento confirmado via VeloraPay para o pedido: ${externalId} (Transação: ${transactionId})`);
-      // O pedido pode ser marcado como liberado no banco/store
+    // Verificar se o evento é de pagamento confirmado
+    const isApproved = 
+      event === "payment.confirmed" || 
+      event === "payment.paid" || 
+      event.includes("paid") || 
+      event.includes("confirmed") || 
+      event.includes("settled");
+
+    if (isApproved) {
+      console.log(`✅ [VeloraPay] Pagamento APROVADO! Pedido: ${externalId} | Transação: ${transactionId}`);
+      // Aqui o acesso ao Drive é marcado como liberado para o aluno
     }
 
     return NextResponse.json({
       received: true,
-      status: "ok",
+      status: "success",
+      event: payload.event || "unknown",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Erro ao processar webhook VeloraPay:", error);
-    return NextResponse.json({ error: "Webhook processing error" }, { status: 400 });
+    console.error("Erro no processamento do webhook VeloraPay:", error);
+    return NextResponse.json({ error: "Webhook error" }, { status: 400 });
   }
 }
 
 export async function GET() {
   return NextResponse.json({
-    service: "VeloraPay Webhook Endpoint",
-    status: "active",
-    instructions: "Configure esta URL no painel da VeloraPay para confirmação automática de PIX.",
+    gateway: "VeloraPay",
+    endpoint: "Webhook Oficial Ativo",
+    eventsSupported: ["payment.created", "payment.confirmed", "payment.failed", "payment.refunded"],
+    secretConfigured: !!VELORA_CONFIG.webhookSecret,
   });
 }

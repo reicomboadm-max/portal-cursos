@@ -13,6 +13,10 @@ export const SITE_SETTINGS: SiteSettings = {
   bannerNotice: "🔥 Novos cursos Fiscal e Tribunais disponíveis com acesso imediato via Google Drive!",
   deliveryTimeNotice: "Envio do acesso ao Drive em até 24 horas após confirmação do pagamento PIX",
   allowSelfRegistration: true,
+  veloraEnabled: true,
+  veloraApiKey: "0f9aefdb-e37e-45a8-a069-9780bdac8734",
+  veloraApiSecret: "",
+  veloraWebhookSecret: "b17ce96282830488fbb6935a7b6782791",
 };
 
 export const SEGMENTS: { key: string; label: string; color: string }[] = [
