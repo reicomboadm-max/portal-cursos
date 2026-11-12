@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
+import { SegmentType } from "@/types";
 import { 
   FolderLock, 
   Menu, 
@@ -20,7 +21,7 @@ export function Header() {
   const { settings, currentUser, setActiveSegmentFilter } = useStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleSegmentClick = (segment: "fiscal" | "tribunais" | "combos") => {
+  const handleSegmentClick = (segment: SegmentType) => {
     setActiveSegmentFilter(segment);
     if (pathname !== "/") {
       router.push("/");
@@ -32,7 +33,7 @@ export function Header() {
   const whatsappUrl = `https://wa.me/${cleanWhatsappNumber}?text=Ol%C3%A1!%20Gostaria%20de%20tirar%20d%C3%BAvidas%20sobre%20os%20drives%20de%20cursos.`;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#07090e]/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-[#0B0F19]/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
         {/* Brand Logo */}
@@ -41,50 +42,62 @@ export function Header() {
           onClick={() => setActiveSegmentFilter("todos")}
           className="flex items-center gap-3 group"
         >
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 p-[1.5px] shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition">
-            <div className="w-full h-full bg-[#0b0f19] rounded-[10px] flex items-center justify-center">
-              <FolderLock className="w-6 h-6 text-indigo-400 group-hover:text-cyan-400 transition" />
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 to-indigo-600 p-[1.5px] shadow-lg shadow-emerald-500/10 transition">
+            <div className="w-full h-full bg-[#111827] rounded-[10px] flex items-center justify-center">
+              <FolderLock className="w-6 h-6 text-emerald-400 group-hover:text-indigo-400 transition" />
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-indigo-300 transition">
+              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white transition">
                 {settings.siteName.split(" ")[0]}
               </span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 DRIVE 2026
               </span>
             </div>
-            <p className="text-[11px] text-gray-400 hidden sm:block">Acesso Vitalício & Downloads Liberados</p>
+            <p className="text-[11px] text-gray-400 hidden sm:block">Acesso Vitalício no Google Drive</p>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+        <nav className="hidden xl:flex items-center gap-1">
           <Link
             href="/"
             onClick={() => setActiveSegmentFilter("todos")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition"
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-slate-800/60 transition"
           >
-            Início
+            Todos
           </Link>
           <button
             onClick={() => handleSegmentClick("fiscal")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-indigo-400 hover:bg-white/5 transition flex items-center gap-1.5"
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-1.5"
           >
-            <span>🏛️</span> Área Fiscal
+            <span>🏛️</span> Fiscal & Tributário
+          </button>
+          <button
+            onClick={() => handleSegmentClick("policial")}
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-1.5"
+          >
+            <span>🛡️</span> Policial
           </button>
           <button
             onClick={() => handleSegmentClick("tribunais")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-cyan-400 hover:bg-white/5 transition flex items-center gap-1.5"
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-1.5"
           >
-            <span>⚖️</span> Tribunais
+            <span>⚖️</span> Tribunais & MP
           </button>
           <button
-            onClick={() => handleSegmentClick("combos")}
-            className="px-3 py-2 rounded-lg text-sm font-medium text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 transition flex items-center gap-1.5 font-semibold"
+            onClick={() => handleSegmentClick("administrativo")}
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-1.5"
           >
-            <span>⭐</span> Combos VIP
+            <span>🏢</span> Admin & Bancos
+          </button>
+          <button
+            onClick={() => handleSegmentClick("disciplinas")}
+            className="px-3 py-2 rounded-lg text-xs font-semibold text-gray-300 hover:text-white hover:bg-slate-800/60 transition flex items-center gap-1.5"
+          >
+            <span>📚</span> Professores & Isoladas
           </button>
         </nav>
 
@@ -145,27 +158,39 @@ export function Header() {
               router.push("/");
               setMobileMenuOpen(false);
             }}
-            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-slate-800"
           >
-            🏠 Início
+            🏠 Todos os Cursos
           </button>
           <button
             onClick={() => handleSegmentClick("fiscal")}
-            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-slate-800"
           >
-            🏛️ Área Fiscal (Receita, SEFAZ, ISS)
+            🏛️ Fiscal & Tributário
+          </button>
+          <button
+            onClick={() => handleSegmentClick("policial")}
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-slate-800"
+          >
+            🛡️ Carreiras Policiais
           </button>
           <button
             onClick={() => handleSegmentClick("tribunais")}
-            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5"
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-slate-800"
           >
-            ⚖️ Tribunais (TRF, TRT, TJ, TSE)
+            ⚖️ Tribunais & Ministério Público
           </button>
           <button
-            onClick={() => handleSegmentClick("combos")}
-            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-amber-400 hover:bg-amber-400/10"
+            onClick={() => handleSegmentClick("administrativo")}
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-slate-800"
           >
-            ⭐ Super Combos Passaporte Total
+            🏢 Administrativo & Bancos
+          </button>
+          <button
+            onClick={() => handleSegmentClick("disciplinas")}
+            className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-slate-800"
+          >
+            📚 Professores & Isoladas
           </button>
 
           <div className="pt-3 border-t border-white/10 space-y-2">

@@ -663,16 +663,16 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => {
-                  if (confirm("Deseja restaurar/sincronizar os 133 cursos completos da vitrine oficial?")) {
+                  if (confirm("Deseja restaurar/sincronizar os 99 cursos organizados por área do catálogo oficial?")) {
                     resetCatalogToDefault();
-                    alert("Catálogo sincronizado com sucesso com todos os 133 cursos!");
+                    alert("Catálogo sincronizado com sucesso com todos os 99 cursos!");
                   }
                 }}
                 className="py-2 px-3.5 rounded-xl font-bold text-xs bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition cursor-pointer"
-                title="Sincronizar os 133 cursos"
+                title="Sincronizar os 99 cursos"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-                <span>Sincronizar 133 Cursos</span>
+                <span>Sincronizar 99 Cursos</span>
               </button>
               <button
                 onClick={() => {
@@ -824,14 +824,16 @@ export default function AdminDashboardPage() {
                     onChange={(e) => handleEditChange("segment", e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="fiscal">Área Fiscal</option>
-                    <option value="tribunais">Tribunais</option>
-                    <option value="combos">Combos VIP</option>
+                    <option value="fiscal">Área Fiscal & Tributária</option>
+                    <option value="policial">Carreiras Policiais</option>
+                    <option value="tribunais">Tribunais & MP</option>
+                    <option value="administrativo">Administrativo & Bancos</option>
+                    <option value="disciplinas">Professores & Isoladas</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Plataforma (ex: Estratégia, Gran, Direção)
+                    Professor / Formato (ex: Prof. Igor Cintra, Material Completo 2026)
                   </label>
                   <input
                     type="text"

@@ -1,11 +1,13 @@
-import type { Course, Order, StudentUser, SiteSettings } from "@/types";
+import type { Course, Order, StudentUser, SiteSettings, SegmentType } from "@/types";
 import { initialCourses, initialOrders, initialSiteSettings } from "@/data/courses";
 
 export const SITE_SETTINGS: SiteSettings = initialSiteSettings;
-export const SEGMENTS: { key: string; label: string; color: string }[] = [
-  { key: "fiscal", label: "Fiscal", color: "text-brand-500 border-brand-500/30" },
-  { key: "tribunais", label: "Tribunais", color: "text-accent-cyan border-accent-cyan/30" },
-  { key: "combos", label: "Combos VIP", color: "text-amber-400 border-amber-500/30" },
+export const SEGMENTS: { key: SegmentType; label: string; icon: string }[] = [
+  { key: "fiscal", label: "Fiscal & Tributário", icon: "🏛️" },
+  { key: "policial", label: "Carreiras Policiais", icon: "🛡️" },
+  { key: "tribunais", label: "Tribunais & MP", icon: "⚖️" },
+  { key: "administrativo", label: "Administrativo & Bancos", icon: "🏢" },
+  { key: "disciplinas", label: "Professores & Isoladas", icon: "📚" },
 ];
 
 export const COURSES: Course[] = initialCourses;

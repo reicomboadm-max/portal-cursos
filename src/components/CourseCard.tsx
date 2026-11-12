@@ -9,27 +9,51 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-  const isCombo = course.segment === "combos";
-  const isFiscal = course.segment === "fiscal";
+  const getBadgeStyle = (segment: string) => {
+    switch (segment) {
+      case "fiscal":
+        return "text-emerald-400 border-emerald-500/30 bg-emerald-500/10";
+      case "policial":
+        return "text-sky-400 border-sky-500/30 bg-sky-500/10";
+      case "tribunais":
+        return "text-amber-400 border-amber-500/30 bg-amber-500/10";
+      case "administrativo":
+        return "text-purple-400 border-purple-500/30 bg-purple-500/10";
+      case "disciplinas":
+        return "text-indigo-400 border-indigo-500/30 bg-indigo-500/10";
+      default:
+        return "text-slate-300 border-slate-700 bg-slate-800";
+    }
+  };
+
+  const getAreaLabel = (segment: string) => {
+    switch (segment) {
+      case "fiscal":
+        return "Área Fiscal";
+      case "policial":
+        return "Carreira Policial";
+      case "tribunais":
+        return "Tribunais & MP";
+      case "administrativo":
+        return "Admin & Bancos";
+      case "disciplinas":
+        return "Professor VIP";
+      default:
+        return "Concurso";
+    }
+  };
 
   return (
     <article
-      className="group relative rounded-2xl border border-white/10 bg-surface-200 p-6 hover:border-white/30 hover:shadow-card-hover transition-all duration-300 overflow-hidden"
+      className="group relative rounded-2xl border border-slate-800 bg-[#111827] p-6 hover:border-slate-700 hover:shadow-xl transition-all duration-300 overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
       <div className="relative z-10 flex flex-col h-full">
         <div className="flex items-center gap-2 mb-3">
-          <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider border ${
-            isCombo 
-              ? "text-amber-400 border-amber-500/30 bg-amber-500/10" 
-              : isFiscal 
-                ? "text-brand-400 border-brand-500/30 bg-brand-500/10" 
-                : "text-accent-cyan border-accent-cyan/30 bg-accent-cyan/10"
-          }`}>
-            {isCombo ? "Combo VIP" : isFiscal ? "Fiscal" : "Tribunais"}
+          <span className={`px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider border ${getBadgeStyle(course.segment)}`}>
+            {getAreaLabel(course.segment)}
           </span>
           {course.badge && (
-            <span className="ml-auto px-2 py-1 rounded bg-brand-600/20 text-brand-300 text-xs font-bold border border-brand-500/30">
+            <span className="ml-auto px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-xs font-medium border border-slate-700">
               {course.badge}
             </span>
           )}
@@ -37,33 +61,33 @@ export default function CourseCard({ course }: CourseCardProps) {
 
         <Link
           href={`/cursos/${course.slug}`}
-          className="group-hover:text-brand-400 transition-colors"
+          className="group-hover:text-emerald-400 transition-colors"
         >
-          <h3 className="text-xl font-bold text-white mb-1 group-hover:underline">{course.title}</h3>
-          <p className="text-sm text-gray-400 mb-4 line-clamp-2">{course.description}</p>
+          <h3 className="text-lg font-bold text-white mb-1.5 leading-snug group-hover:underline">{course.title}</h3>
+          <p className="text-xs text-slate-400 mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
         </Link>
 
-        <div className="mt-auto pt-4 border-t border-white/10">
+        <div className="mt-auto pt-4 border-t border-slate-800">
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-2xl font-bold text-white">R$ {course.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+            <span className="text-2xl font-black text-white">R$ {course.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
             {course.originalPrice > course.price && (
-              <span className="text-sm text-gray-500 line-through">R$ {course.originalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+              <span className="text-xs text-slate-500 line-through">R$ {course.originalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
-            <Folder className="w-3 h-3" />
+          <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
+            <Folder className="w-3.5 h-3.5 text-emerald-400" />
             <span>{course.folderSize}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
-            <FileText className="w-3 h-3" />
+          <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
+            <FileText className="w-3.5 h-3.5 text-indigo-400" />
             <span>{course.totalFiles}</span>
           </div>
           <Link
             href={`/checkout?course=${course.id}`}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl transition-colors shadow-neon"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-colors shadow-md cursor-pointer"
           >
-            <Play className="w-4 h-4" />
-            Comprar Agora
+            <Play className="w-3.5 h-3.5 fill-white" />
+            Comprar Acesso no Drive
           </Link>
         </div>
       </div>

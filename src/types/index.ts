@@ -1,4 +1,4 @@
-export type SegmentType = "fiscal" | "tribunais" | "combos";
+export type SegmentType = "fiscal" | "policial" | "tribunais" | "administrativo" | "disciplinas";
 
 export type StockStatus = "in_stock" | "low_stock" | "out_of_stock";
 

@@ -39,39 +39,55 @@ export default function Footer() {
           {/* Column 2: Cursos & Segmentos */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Segmentos
+              Áreas de Concurso
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <button
                   onClick={() => setActiveSegmentFilter("fiscal")}
-                  className="hover:text-indigo-400 transition"
+                  className="hover:text-emerald-400 transition"
                 >
-                  🏛️ Área Fiscal (Receita, SEFAZ, ISS)
+                  🏛️ Área Fiscal & Tributária
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setActiveSegmentFilter("policial")}
+                  className="hover:text-sky-400 transition"
+                >
+                  🛡️ Carreiras Policiais
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setActiveSegmentFilter("tribunais")}
-                  className="hover:text-cyan-400 transition"
+                  className="hover:text-amber-400 transition"
                 >
-                  ⚖️ Tribunais (TJ, TRT, TRF, TSE)
+                  ⚖️ Tribunais & Ministério Público
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => setActiveSegmentFilter("combos")}
-                  className="hover:text-amber-400 transition"
+                  onClick={() => setActiveSegmentFilter("administrativo")}
+                  className="hover:text-purple-400 transition"
                 >
-                  ⭐ Super Combos Passaporte
+                  🏢 Administrativo & Bancos
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => setActiveSegmentFilter("disciplinas")}
+                  className="hover:text-indigo-400 transition"
+                >
+                  📚 Professores & Isoladas
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => setActiveSegmentFilter("todos")}
-                  className="hover:text-white transition"
+                  className="hover:text-white transition font-semibold"
                 >
-                  🔥 Todos os Cursos Disponíveis
+                  Ver Todos os Cursos
                 </button>
               </li>
             </ul>

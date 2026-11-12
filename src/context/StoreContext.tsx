@@ -56,7 +56,7 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const COURSES_STORAGE_KEY = "concurso_courses_v3";
+const COURSES_STORAGE_KEY = "concurso_courses_v5";
 const ORDERS_STORAGE_KEY = "concurso_orders_v2";
 const SETTINGS_STORAGE_KEY = "concurso_settings_v2";
 const USER_STORAGE_KEY = "concurso_current_user_v2";
@@ -83,13 +83,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       // Clean up legacy caches
       localStorage.removeItem("concurso_courses");
       localStorage.removeItem("concurso_courses_v2");
+      localStorage.removeItem("concurso_courses_v3");
+      localStorage.removeItem("concurso_courses_v4");
 
       const storedCourses = localStorage.getItem(COURSES_STORAGE_KEY);
       if (storedCourses) {
         const parsed = JSON.parse(storedCourses);
-        // If stored courses is an older version with fewer courses, update to full catalog
-        if (Array.isArray(parsed) && parsed.length >= initialCourses.length) {
-          setCourses(parsed);
+        // Ensure no leftover combos in stored list
+        const cleanList = Array.isArray(parsed) 
+          ? parsed.filter((c: Course) => c.segment !== ("combos" as any) && !c.title.toLowerCase().startsWith("combo"))
+          : [];
+
+        if (cleanList.length >= initialCourses.length) {
+          setCourses(cleanList);
         } else {
           setCourses(initialCourses);
           localStorage.setItem(COURSES_STORAGE_KEY, JSON.stringify(initialCourses));
@@ -231,7 +237,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     studentWhatsapp?: string;
     studentCpf?: string;
   }): Promise<Order> => {
-    const course = courses.find((c) => c.id === data.courseId);
+    const course = courses.find((c) => c.id === data.courseId) || selectedCourseForCheckout;
     if (!course) throw new Error("Curso não encontrado.");
 
     let orderId = "";
