@@ -44,6 +44,7 @@ interface StoreContextType {
   addCourse: (course: Omit<Course, "id">) => void;
   updateCourse: (course: Course) => void;
   deleteCourse: (courseId: string) => void;
+  resetCatalogToDefault: () => void;
   updateSettings: (newSettings: Partial<SiteSettings>) => void;
   loginAsStudent: (email: string, name?: string) => StudentUser;
   logout: () => void;
@@ -55,7 +56,7 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const COURSES_STORAGE_KEY = "concurso_courses_v2";
+const COURSES_STORAGE_KEY = "concurso_courses_v3";
 const ORDERS_STORAGE_KEY = "concurso_orders_v2";
 const SETTINGS_STORAGE_KEY = "concurso_settings_v2";
 const USER_STORAGE_KEY = "concurso_current_user_v2";
@@ -81,7 +82,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       const storedCourses = localStorage.getItem(COURSES_STORAGE_KEY);
       if (storedCourses) {
-        setCourses(JSON.parse(storedCourses));
+        const parsed = JSON.parse(storedCourses);
+        // If stored courses is an older version with fewer courses, update to full catalog
+        if (Array.isArray(parsed) && parsed.length >= initialCourses.length) {
+          setCourses(parsed);
+        } else {
+          setCourses(initialCourses);
+          localStorage.setItem(COURSES_STORAGE_KEY, JSON.stringify(initialCourses));
+        }
+      } else {
+        setCourses(initialCourses);
       }
 
       const storedOrders = localStorage.getItem(ORDERS_STORAGE_KEY);
@@ -421,6 +431,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setCourses((prev) => prev.filter((c) => c.id !== courseId));
   };
 
+  const resetCatalogToDefault = () => {
+    setCourses(initialCourses);
+    try {
+      localStorage.setItem(COURSES_STORAGE_KEY, JSON.stringify(initialCourses));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const updateSettings = (newSettings: Partial<SiteSettings>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }));
   };
@@ -477,6 +496,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         addCourse,
         updateCourse,
         deleteCourse,
+        resetCatalogToDefault,
         updateSettings,
         loginAsStudent,
         logout,

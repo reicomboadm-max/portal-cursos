@@ -27,7 +27,8 @@ import {
   Save, 
   Lock,
   ArrowLeft,
-  Sparkles
+  Sparkles,
+  RefreshCw
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -41,6 +42,7 @@ export default function AdminDashboardPage() {
     updateCourse,
     addCourse,
     deleteCourse,
+    resetCatalogToDefault,
     updateSettings,
     getUniqueStudents,
     deleteStudent,
@@ -170,9 +172,8 @@ export default function AdminDashboardPage() {
     setIsCreatingCourse(false);
   };
 
-  const handleEditChange = (key: string, value: string) => {
-    if (!editForm) return;
-    setEditForm({ ...editForm, [key]: value });
+  const handleEditChange = (key: string, value: any) => {
+    setEditForm((prev) => (prev ? { ...prev, [key]: value } : ({ [key]: value } as any)));
   };
 
   const handleEditFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -657,35 +658,50 @@ export default function AdminDashboardPage() {
       {/* TAB 2: COURSE MANAGEMENT */}
       {activeTab === "courses" && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-white">Catálogo de Cursos & Links de Pastas</h3>
-            <button
-              onClick={() => {
-                setEditingCourse(null);
-                setIsCreatingCourse(true);
-                setEditForm({
-                  title: "",
-                  slug: "",
-                  segment: "fiscal",
-                  platform: "",
-                  description: "",
-                  shortDescription: "",
-                  badge: "",
-                  originalPrice: "",
-                  price: "",
-                  driveUrl: "",
-                  features: "",
-                  folderSize: "",
-                  totalFiles: "",
-                  coverGradient: "from-indigo-600 to-purple-600",
-                  active: true,
-                });
-              }}
-              className="py-2 px-3.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Adicionar Novo Curso</span>
-            </button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h3 className="text-lg font-bold text-white">Catálogo de Cursos & Links de Pastas ({courses.length})</h3>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => {
+                  if (confirm("Deseja restaurar/sincronizar os 133 cursos completos da vitrine oficial?")) {
+                    resetCatalogToDefault();
+                    alert("Catálogo sincronizado com sucesso com todos os 133 cursos!");
+                  }
+                }}
+                className="py-2 px-3.5 rounded-xl font-bold text-xs bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition cursor-pointer"
+                title="Sincronizar os 133 cursos"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Sincronizar 133 Cursos</span>
+              </button>
+              <button
+                onClick={() => {
+                  setEditingCourse(null);
+                  setIsCreatingCourse(true);
+                  setEditForm({
+                    title: "",
+                    slug: "",
+                    segment: "fiscal",
+                    platform: "",
+                    description: "",
+                    shortDescription: "",
+                    badge: "",
+                    originalPrice: "",
+                    price: "",
+                    driveUrl: "",
+                    features: "",
+                    folderSize: "",
+                    totalFiles: "",
+                    coverGradient: "from-indigo-600 to-purple-600",
+                    active: true,
+                  });
+                }}
+                className="py-2 px-3.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Adicionar Novo Curso</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -735,11 +751,8 @@ export default function AdminDashboardPage() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => {
-                        setEditingCourse(c);
-                        setIsCreatingCourse(false);
-                      }}
-                      className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-indigo-300 hover:text-white transition"
+                      onClick={() => openEditCourse(c)}
+                      className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-indigo-300 hover:text-white transition flex items-center gap-1 cursor-pointer"
                     >
                       <Edit3 className="w-3 h-3" /> Editar
                     </button>
