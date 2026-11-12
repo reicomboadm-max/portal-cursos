@@ -3,7 +3,7 @@ import { Course, SiteSettings, Order } from "@/types";
 export const initialSiteSettings: SiteSettings = {
   siteName: "DriveConcursos VIP",
   tagline: "Os melhores materiais para concursos em pastas do Google Drive com envio no seu Gmail em até 24 horas",
-  adminEmails: ["admin@driveconcursos.com", "thiago@driveconcursos.com"],
+  adminEmails: ["reicomboadm@gmail.com"],
   pixKey: "pix@driveconcursos.com",
   pixKeyType: "E-mail",
   beneficiaryName: "PORTAL CONCURSOS BR",

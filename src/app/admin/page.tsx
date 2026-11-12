@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -58,15 +58,42 @@ export default function AdminDashboardPage() {
   const [localSettings, setLocalSettings] = useState(settings);
   const [settingsSaved, setSettingsSaved] = useState(false);
 
-  // Handle password gate
+  // Check saved admin session
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("admin_authenticated_email");
+      if (saved) {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
+
+  // Handle password / email gate
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanPass = adminPassInput.trim();
-    if (cleanPass === "admin123" || cleanPass === "thiago" || settings.adminEmails.some(em => em.toLowerCase() === cleanPass.toLowerCase())) {
+    const isAuthorized =
+      cleanPass.toLowerCase() === "reicomboadm@gmail.com" ||
+      cleanPass === "admin123" ||
+      cleanPass === "thiago" ||
+      cleanPass === "reicomboadm" ||
+      settings.adminEmails.some(em => em.toLowerCase() === cleanPass.toLowerCase());
+
+    if (isAuthorized) {
       setIsAuthenticated(true);
       setAuthError(false);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("admin_authenticated_email", "reicomboadm@gmail.com");
+      }
     } else {
       setAuthError(true);
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("admin_authenticated_email");
     }
   };
 
@@ -110,19 +137,23 @@ export default function AdminDashboardPage() {
       <div className="py-20 px-4 max-w-md mx-auto">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto mb-3 border border-purple-500/20">
-            <Lock className="w-8 h-8" />
+            <Lock className="w-7 h-7" />
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold mb-2">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Área Exclusiva para Administrador</span>
           </div>
           <h1 className="text-2xl font-black text-white">Painel Administrativo</h1>
           <p className="text-xs text-gray-400 mt-1">
-            Área restrita aos administradores do site.
+            Administrador Principal: <span className="text-purple-300 font-semibold">reicomboadm@gmail.com</span>
           </p>
         </div>
 
-        <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-white/10 shadow-2xl">
+        <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-white/10 shadow-2xl bg-[#0b0f19]/80 backdrop-blur-xl">
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                Senha de Acesso ou E-mail Admin
+                Identificação do Administrador ou Senha
               </label>
               <input
                 type="password"
@@ -132,27 +163,30 @@ export default function AdminDashboardPage() {
                   setAdminPassInput(e.target.value);
                   setAuthError(false);
                 }}
-                placeholder="Digite a senha (padrão: admin123)"
-                className="w-full px-4 py-3 rounded-xl bg-surface-100 border border-white/10 text-white placeholder-gray-400 text-sm focus:outline-none focus:border-purple-500 transition"
+                placeholder="reicomboadm@gmail.com ou senha"
+                className="w-full px-4 py-3 rounded-xl bg-surface-100 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500 transition"
               />
               {authError && (
-                <p className="text-xs text-rose-400 mt-1.5 font-medium">
-                  Acesso não autorizado. Tente com a senha: <code className="bg-white/10 px-1 py-0.5 rounded">admin123</code>
-                </p>
+                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 mt-2">
+                  <p className="text-xs text-rose-300 font-medium">
+                    Acesso restrito. Digite <strong className="text-white">reicomboadm@gmail.com</strong> ou a senha administrativa.
+                  </p>
+                </div>
               )}
             </div>
 
             <button
               type="submit"
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/30 transition cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/30 transition cursor-pointer flex items-center justify-center gap-2"
             >
-              Acessar Painel
+              <ShieldCheck className="w-4 h-4" />
+              <span>Acessar Painel de Admin</span>
             </button>
           </form>
 
           <div className="mt-5 pt-4 border-t border-white/5 text-center">
             <Link href="/" className="text-xs text-gray-400 hover:text-white transition">
-              ← Voltar para o Site
+              ← Voltar para o Site Principal
             </Link>
           </div>
         </div>
@@ -167,14 +201,20 @@ export default function AdminDashboardPage() {
       {/* Top Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-              DASHBOARD ADMIN
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              ADMINISTRADOR PRINCIPAL
             </span>
-            <span className="text-xs text-gray-400">Tempo Real</span>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0e1322] text-white border border-white/10">
+              reicomboadm@gmail.com
+            </span>
+            <span className="text-[11px] text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Acesso Liberado
+            </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white mt-1">
-            Gestão de Vendas & Conteúdo
+          <h1 className="text-2xl sm:text-3xl font-black text-white mt-2">
+            Gestão de Vendas & Liberação de Drives
           </h1>
         </div>
 
@@ -188,8 +228,8 @@ export default function AdminDashboardPage() {
           </Link>
 
           <button
-            onClick={() => setIsAuthenticated(false)}
-            className="px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 transition"
+            onClick={handleLogout}
+            className="px-3.5 py-2 rounded-xl text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition cursor-pointer"
           >
             Sair do Admin
           </button>
@@ -573,6 +613,36 @@ export default function AdminDashboardPage() {
               onChange={(e) => setLocalSettings({ ...localSettings, siteName: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs"
             />
+          </div>
+
+          {/* Administrador Principal */}
+          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-purple-400" />
+                <span className="text-xs font-bold text-white uppercase tracking-wider">
+                  Administrador Principal do Site
+                </span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                Acesso Total / Super Admin
+              </span>
+            </div>
+            <div>
+              <input
+                type="email"
+                value={localSettings.adminEmails?.[0] || "reicomboadm@gmail.com"}
+                onChange={(e) => {
+                  const newEmails = [...(localSettings.adminEmails || ["reicomboadm@gmail.com"])];
+                  newEmails[0] = e.target.value.trim().toLowerCase();
+                  setLocalSettings({ ...localSettings, adminEmails: newEmails });
+                }}
+                className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-semibold"
+              />
+              <p className="text-[11px] text-gray-400 mt-1">
+                E-mail com permissão irrestrita para gerenciar vendas, cursos, credenciais VeloraPay e liberação de acessos ao Drive.
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -68,7 +68,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
       const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
       if (storedSettings) {
-        setSettings(JSON.parse(storedSettings));
+        const parsed = JSON.parse(storedSettings);
+        const adminEmails = Array.from(new Set(["reicomboadm@gmail.com", ...(parsed.adminEmails || [])]));
+        setSettings({ ...initialSiteSettings, ...parsed, adminEmails });
       }
 
       const storedUser = localStorage.getItem(USER_STORAGE_KEY);

@@ -3,7 +3,7 @@ import type { Course, Order, StudentUser, SiteSettings } from "@/types";
 export const SITE_SETTINGS: SiteSettings = {
   siteName: "Portal Cursos Concursos",
   tagline: "Prepare-se com os melhores cursos para concursos públicos",
-  adminEmails: ["admin@seuemail.com", "admin2@seuemail.com"],
+  adminEmails: ["reicomboadm@gmail.com"],
   pixKey: "SUA_CHAVE_PIX_AQUI",
   pixKeyType: "EVP",
   beneficiaryName: "SEU NOME / EMPRESA AQUI",
