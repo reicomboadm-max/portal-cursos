@@ -25,10 +25,10 @@ export async function POST(req: Request) {
     const driveUrl = courseDriveUrl || defaultCourse?.driveUrl || "https://drive.google.com";
     const segment = courseSegment || defaultCourse?.segment || "fiscal";
 
-    // Validar e-mail Gmail para acesso ao Drive
-    if (!email || !email.includes("@gmail.com")) {
+    const cleanEmail = (email || "").trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
       return NextResponse.json(
-        { error: "E-mail Gmail é obrigatório para liberação da pasta no Google Drive" },
+        { error: "Informe um e-mail válido para liberação da pasta no Google Drive" },
         { status: 400 }
       );
     }
@@ -39,14 +39,21 @@ export async function POST(req: Request) {
     const veloraResponse = await createVeloraPixPayment({
       amount: price,
       orderId,
-      description: `Acesso Drive 2026: ${title}`.slice(0, 100),
+      description: `Acesso Drive: ${title}`.slice(0, 100),
       customer: {
-        name: nome,
-        email: email,
+        name: nome || "Aluno",
+        email: cleanEmail,
         phone: whatsapp || "",
         document: cpf || "",
       },
     });
+
+    if (!veloraResponse.pixCopiaECola) {
+      return NextResponse.json(
+        { error: "A VeloraPay não retornou o código PIX copia e cola. Verifique as credenciais da API." },
+        { status: 502 }
+      );
+    }
 
     const order: Order = {
       id: orderId,

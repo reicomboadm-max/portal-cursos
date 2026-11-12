@@ -95,28 +95,11 @@ export async function createVeloraPixPayment(
       };
     } else {
       const errText = await response.text();
-      console.warn("⚠️ VeloraPay /payments/create erro:", response.status, errText);
+      console.error("❌ VeloraPay /payments/create erro:", response.status, errText);
+      throw new Error(`VeloraPay retornou erro ${response.status}: ${errText}`);
     }
-  } catch (err) {
-    console.error("Erro ao conectar na API VeloraPay:", err);
+  } catch (err: any) {
+    console.error("Erro ao processar VeloraPay:", err);
+    throw err;
   }
-
-  // Fallback com QR Code legível caso a API esteja temporariamente instável
-  const fallbackPix = `00020126580014BR.GOV.BCB.PIX0136velora-${apiKey.slice(0, 8)}-${req.orderId}520400005303986540${Number(req.amount).toFixed(2)}5802BR59${req.customer.name.slice(0, 25)}6009SAO PAULO62290525VELORA:${req.orderId}6304`;
-  let fallbackQr = "";
-  try {
-    fallbackQr = await QRCode.toDataURL(fallbackPix, {
-      margin: 2,
-      width: 320,
-      color: { dark: "#0b0f19", light: "#ffffff" },
-    });
-  } catch {}
-
-  return {
-    success: true,
-    transactionId: `VEL-${Date.now()}`,
-    pixCopiaECola: fallbackPix,
-    qrCodeBase64: fallbackQr,
-    qrCodeUrl: fallbackQr,
-  };
 }

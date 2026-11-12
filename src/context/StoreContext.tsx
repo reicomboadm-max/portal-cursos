@@ -262,26 +262,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (json.pixCopyPaste) pixCopyPaste = json.pixCopyPaste;
         if (json.qrCode) qrCodeUrl = json.qrCode;
         if (json.transactionId) transactionId = json.transactionId;
+      } else {
+        const jsonErr = await res.json();
+        throw new Error(jsonErr.error || "Erro ao gerar PIX oficial na VeloraPay");
       }
-    } catch (apiErr) {
-      console.warn("Could not reach /api/checkout, using fallback generator", apiErr);
+    } catch (apiErr: any) {
+      console.error("Erro na chamada de checkout:", apiErr);
+      throw apiErr;
     }
 
-    // Fallback: generate orderId if API failed
-    if (!orderId) {
-      orderId = `ORD-${Math.floor(10000 + Math.random() * 90000)}`;
-    }
-
-    if (!pixCopyPaste) {
-      const pixPayloadFallback = generatePixPayload({
-        pixKey: settings.pixKey,
-        beneficiaryName: settings.beneficiaryName,
-        beneficiaryCity: settings.beneficiaryCity,
-        amount: course.price,
-        txid: orderId.replace("-", ""),
-        description: course.title.slice(0, 25),
-      });
-      pixCopyPaste = pixPayloadFallback;
+    if (!orderId || !pixCopyPaste) {
+      throw new Error("Erro ao obter código PIX da operadora.");
     }
 
     if (!qrCodeUrl && pixCopyPaste) {

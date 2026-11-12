@@ -94,9 +94,9 @@ export function CheckoutModal() {
 
       setOrder(newOrder);
       setStep("pix");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Erro ao gerar pedido. Verifique os dados e tente novamente.");
+      alert(err?.message || "Erro ao gerar pedido PIX. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
