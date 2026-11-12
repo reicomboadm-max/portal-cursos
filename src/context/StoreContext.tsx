@@ -80,6 +80,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // Load from localStorage on client mount
   useEffect(() => {
     try {
+      // Clean up legacy caches
+      localStorage.removeItem("concurso_courses");
+      localStorage.removeItem("concurso_courses_v2");
+
       const storedCourses = localStorage.getItem(COURSES_STORAGE_KEY);
       if (storedCourses) {
         const parsed = JSON.parse(storedCourses);
@@ -92,6 +96,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         setCourses(initialCourses);
+        localStorage.setItem(COURSES_STORAGE_KEY, JSON.stringify(initialCourses));
       }
 
       const storedOrders = localStorage.getItem(ORDERS_STORAGE_KEY);

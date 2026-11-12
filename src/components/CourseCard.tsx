@@ -9,8 +9,8 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-  const segmentColor =
-    course.segment === "fiscal" ? "brand" : "accent-cyan";
+  const isCombo = course.segment === "combos";
+  const isFiscal = course.segment === "fiscal";
 
   return (
     <article
@@ -19,8 +19,14 @@ export default function CourseCard({ course }: CourseCardProps) {
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
       <div className="relative z-10 flex flex-col h-full">
         <div className="flex items-center gap-2 mb-3">
-          <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider border ${segmentColor === "brand" ? "text-brand-400 border-brand-500/30 bg-brand-500/10" : "text-accent-cyan/400 border-accent-cyan/30 bg-accent-cyan/10"}`}>
-            {course.segment === "fiscal" ? "Fiscal" : "Tribunais"}
+          <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider border ${
+            isCombo 
+              ? "text-amber-400 border-amber-500/30 bg-amber-500/10" 
+              : isFiscal 
+                ? "text-brand-400 border-brand-500/30 bg-brand-500/10" 
+                : "text-accent-cyan border-accent-cyan/30 bg-accent-cyan/10"
+          }`}>
+            {isCombo ? "Combo VIP" : isFiscal ? "Fiscal" : "Tribunais"}
           </span>
           {course.badge && (
             <span className="ml-auto px-2 py-1 rounded bg-brand-600/20 text-brand-300 text-xs font-bold border border-brand-500/30">

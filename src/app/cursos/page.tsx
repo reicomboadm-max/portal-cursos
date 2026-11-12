@@ -5,32 +5,33 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CourseCard from "@/components/CourseCard";
-import { COURSES, SEGMENTS, SITE_SETTINGS } from "@/lib/data";
+import { SEGMENTS } from "@/lib/data";
+import { useStore } from "@/context/StoreContext";
 import type { Course } from "@/types";
 
 export default function CursosPage() {
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
+  const { courses, settings, currentUser, loginAsStudent, logout } = useStore();
   const [segmento, setSegmento] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
-  const filtered = COURSES.filter((c) => {
+  const filtered = courses.filter((c) => {
     if (segmento && c.segment !== segmento) return false;
     if (search && !c.title.toLowerCase().includes(search.toLowerCase())) return false;
     return c.active;
   });
 
-  const onLogin = () => setUser({ name: "Usuário", email: "usuario@gmail.com", role: "student" });
-  const onLogout = () => setUser(null);
+  const onLogin = () => loginAsStudent("usuario@gmail.com", "Usuário");
+  const onLogout = () => logout();
 
   return (
     <div className="min-h-screen bg-surface-100 text-white">
-      <Navbar user={user} onLogin={onLogin} onLogout={onLogout} />
+      <Navbar user={currentUser} onLogin={onLogin} onLogout={onLogout} />
       <main className="px-4 py-8 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div>
               <h1 className="text-3xl font-bold mb-2">Catálogo de Cursos</h1>
-              <p className="text-gray-400">{SITE_SETTINGS.tagline}</p>
+              <p className="text-gray-400">{settings.tagline}</p>
             </div>
             <div className="flex w-full md:w-auto gap-2">
               <input

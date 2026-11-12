@@ -247,9 +247,8 @@ export default function HomePage() {
           </div>
         ) : (
           /* Cards Grid */
-          <ScrollReveal delay={100} duration={800} distance="30px" origin="bottom">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCourses.map((course) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => {
               const isFiscal = course.segment === "fiscal";
               const isCombo = course.segment === "combos";
               
@@ -366,7 +365,6 @@ export default function HomePage() {
               );
             })}
           </div>
-        </ScrollReveal>
         )}
 
       </main>

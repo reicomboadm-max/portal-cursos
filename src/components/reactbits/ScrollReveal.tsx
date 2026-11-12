@@ -22,13 +22,13 @@ export function ScrollReveal({
   duration = 800,
   distance = "40px",
   origin = "bottom",
-  opacity = 0,
+  opacity = 0.95,
   scale = 1,
   once = true,
   easing = "cubic-bezier(0.16, 1, 0.3, 1)",
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
