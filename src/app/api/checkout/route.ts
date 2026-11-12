@@ -1,17 +1,29 @@
 import { NextResponse } from "next/server";
 import { COURSES } from "@/lib/data";
 import { createVeloraPixPayment } from "@/lib/velorapay";
+import { orderStore } from "@/lib/orderStore";
 import type { Order } from "@/types";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { courseId, nome, email, whatsapp } = body;
+    const { 
+      courseId, 
+      nome, 
+      email, 
+      whatsapp, 
+      cpf,
+      courseTitle, 
+      coursePrice, 
+      courseDriveUrl, 
+      courseSegment 
+    } = body;
 
-    const course = COURSES.find((c) => c.id === courseId);
-    if (!course) {
-      return NextResponse.json({ error: "Curso não encontrado" }, { status: 404 });
-    }
+    const defaultCourse = COURSES.find((c) => c.id === courseId);
+    const title = courseTitle || defaultCourse?.title || "Curso de Concursos";
+    const price = Number(coursePrice || defaultCourse?.price || 49.90);
+    const driveUrl = courseDriveUrl || defaultCourse?.driveUrl || "https://drive.google.com";
+    const segment = courseSegment || defaultCourse?.segment || "fiscal";
 
     // Validar e-mail Gmail para acesso ao Drive
     if (!email || !email.includes("@gmail.com")) {
@@ -25,13 +37,14 @@ export async function POST(req: Request) {
 
     // Gerar pagamento PIX via VeloraPay
     const veloraResponse = await createVeloraPixPayment({
-      amount: course.price,
+      amount: price,
       orderId,
-      description: `Acesso Drive 2026: ${course.title}`,
+      description: `Acesso Drive 2026: ${title}`.slice(0, 100),
       customer: {
         name: nome,
         email: email,
         phone: whatsapp || "",
+        document: cpf || "",
       },
     });
 
@@ -40,18 +53,26 @@ export async function POST(req: Request) {
       studentName: nome,
       studentEmail: email,
       studentWhatsapp: whatsapp,
-      courseId: course.id,
-      courseTitle: course.title,
-      courseSegment: course.segment,
-      amount: course.price,
+      courseId: courseId || defaultCourse?.id || "custom-course",
+      courseTitle: title,
+      courseSegment: segment,
+      amount: price,
       paymentMethod: "PIX",
       status: "PENDING",
       pixCopyPaste: veloraResponse.pixCopiaECola,
       pixQrCodeUrl: veloraResponse.qrCodeUrl || veloraResponse.qrCodeBase64,
-      driveUrl: course.driveUrl,
+      driveUrl: driveUrl,
       createdAt: new Date().toISOString(),
       veloraTransactionId: veloraResponse.transactionId,
     };
+
+    // Registrar no storage de status para checagem em tempo real
+    orderStore.set(orderId, {
+      orderId,
+      transactionId: veloraResponse.transactionId,
+      status: "PENDING",
+      amount: price,
+    });
 
     return NextResponse.json({
       success: true,

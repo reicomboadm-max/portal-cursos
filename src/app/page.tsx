@@ -23,9 +23,14 @@ import {
   Video,
   ArrowRight,
   Search,
-  Check
+  Check,
+  Users,
+  Award,
+  Flame
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { TextType } from "@/components/reactbits/TextType";
+import { ShinyText } from "@/components/reactbits/ShinyText";
 
 export default function HomePage() {
   const { 
@@ -58,6 +63,87 @@ export default function HomePage() {
       <TopBanner />
       <Header />
       <Hero />
+
+      {/* Animated Stats Section */}
+      <section className="py-12 border-t border-white/5 bg-[#090e1b]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <ShinyText text="Números que falam" className="text-2xl sm:text-3xl font-black mb-3" />
+            <p className="text-sm text-gray-400">Nosso acervo em números para você confiar</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-4">
+                <Flame className="w-5 h-5" />
+              </div>
+              <TextType
+                words={["500+", "600+", "700+"]}
+                className="text-3xl sm:text-4xl font-black text-white mb-1"
+              />
+              <p className="text-xs text-gray-400">cursos no acervo VIP</p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+              <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto mb-4">
+                <Users className="w-5 h-5" />
+              </div>
+              <TextType
+                words={["12.000+", "15.000+", "18.000+"]}
+                className="text-3xl sm:text-4xl font-black text-white mb-1"
+              />
+              <p className="text-xs text-gray-400">alunos aprovados com nossos drives</p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-4">
+                <Award className="w-5 h-5" />
+              </div>
+              <TextType
+                words={["98%", "99%", "100%"]}
+                className="text-3xl sm:text-4xl font-black text-white mb-1"
+              />
+              <p className="text-xs text-gray-400">taxa de entrega em até 24h</p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-[#0c1222] border border-white/5 text-center">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <TextType
+                words={["24h", "12h", "6h"]}
+                className="text-3xl sm:text-4xl font-black text-white mb-1"
+              />
+              <p className="text-xs text-gray-400">tempo médio de liberação de acesso</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Urgency Banner */}
+      <section className="py-8 bg-gradient-to-r from-indigo-950/80 to-purple-950/80 border border-indigo-500/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 rounded-2xl border border-white/10 bg-[#07090e]/60 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-sm sm:text-base">Oferta por tempo limitado</h3>
+                <p className="text-xs text-gray-400">Super combos com preço promocional até o próximo edital</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 text-right sm:text-left">
+              <TextType
+                words={["R$ 89,90", "R$ 79,90", "R$ 69,90"]}
+                typingSpeed={60}
+                className="text-2xl sm:text-3xl font-black text-amber-400"
+              />
+              <span className="text-xs text-gray-400 block sm:inline">Pagamento único via PIX</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Main Course Catalog Section */}
       <main id="cursos" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">

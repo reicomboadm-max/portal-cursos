@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import { isValidCpf, generateValidCpf } from "./cpf";
 
 export interface VeloraPixRequest {
   amount: number; // Em Reais (ex: 49.90)
@@ -37,11 +38,9 @@ export async function createVeloraPixPayment(
   const apiSecret = config?.apiSecret || process.env.VELORAPAY_API_SECRET || VELORA_CONFIG.apiSecret;
   const baseUrl = config?.baseUrl || process.env.VELORAPAY_BASE_URL || VELORA_CONFIG.baseUrl;
 
-  // Formatar documento (CPF de 11 dígitos ou padrão válido)
+  // Formatar documento (CPF válido para garantir aceitação em qualquer app de banco)
   const cleanDoc = (req.customer.document || "").replace(/\D/g, "");
-  const payerDocument = cleanDoc.length === 11 || cleanDoc.length === 14 
-    ? cleanDoc 
-    : "12345678909";
+  const payerDocument = isValidCpf(cleanDoc) ? cleanDoc : generateValidCpf();
 
   const payload = {
     amount: Number(req.amount),
@@ -70,17 +69,19 @@ export async function createVeloraPixPayment(
       const pixString = resData.copyPaste || resData.pix_copy_paste || resData.emv || resData.qrcode_text || resData.pix || resData.code || "";
       let qrBase64 = resData.qrCodeBase64 || resData.qrcodeUrl || resData.qrcode_base64 || resData.qr_code || resData.qrcode || "";
 
-      // Se a Velora retornar apenas a string Copia e Cola, nós geramos a imagem do QR Code
-      if (pixString && !qrBase64) {
+      // Gerar QR Code de altíssima definição (contraste puro para todos os bancos)
+      if (pixString) {
         try {
           qrBase64 = await QRCode.toDataURL(pixString, {
             margin: 2,
-            width: 320,
-            color: { dark: "#0b0f19", light: "#ffffff" },
+            width: 380,
+            color: { dark: "#000000", light: "#ffffff" },
           });
         } catch (e) {
-          console.error("Erro ao gerar QR code a partir da string PIX:", e);
+          qrBase64 = resData.qrCodeBase64 || resData.qrcodeUrl || "";
         }
+      } else if (!qrBase64) {
+        qrBase64 = resData.qrCodeBase64 || resData.qrcodeUrl || "";
       }
 
       return {

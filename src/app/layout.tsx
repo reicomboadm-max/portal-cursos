@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { StoreProvider } from "@/context/StoreContext";
+import { FloatingSupportWidget } from "@/components/FloatingSupportWidget";
 
 export const metadata: Metadata = {
   title: "DriveConcursos VIP • Pastas de Cursos no Google Drive",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body className="bg-[#07090e] text-white antialiased selection:bg-indigo-500 selection:text-white min-h-screen">
         <StoreProvider>
           {children}
+          <FloatingSupportWidget />
         </StoreProvider>
       </body>
     </html>

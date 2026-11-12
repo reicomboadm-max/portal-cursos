@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { VELORA_CONFIG } from "@/lib/velorapay";
+import { orderStore } from "@/lib/orderStore";
 
 export async function POST(req: Request) {
   try {
@@ -34,7 +35,12 @@ export async function POST(req: Request) {
 
     if (isApproved) {
       console.log(`✅ [VeloraPay] Pagamento APROVADO! Pedido: ${externalId} | Transação: ${transactionId}`);
-      // Aqui o acesso ao Drive é marcado como liberado para o aluno
+      if (externalId) {
+        orderStore.markPaid(externalId, { amount: payload.amount });
+      }
+      if (transactionId) {
+        orderStore.markPaid(transactionId, { amount: payload.amount });
+      }
     }
 
     return NextResponse.json({

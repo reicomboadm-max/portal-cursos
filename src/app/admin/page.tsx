@@ -35,17 +35,21 @@ export default function AdminDashboardPage() {
     courses, 
     settings, 
     updateOrderStatus, 
-    updateCourse, 
-    addCourse, 
-    deleteCourse, 
-    updateSettings 
+    deleteOrder,
+    clearTestOrders,
+    updateCourse,
+    addCourse,
+    deleteCourse,
+    updateSettings,
+    getUniqueStudents,
+    deleteStudent,
   } = useStore();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminPassInput, setAdminPassInput] = useState("");
   const [authError, setAuthError] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<"sales" | "courses" | "settings">("sales");
+  const [activeTab, setActiveTab] = useState<"sales" | "courses" | "settings" | "clientes">("sales");
   const [orderFilter, setOrderFilter] = useState<"ALL" | OrderStatus>("ALL");
   const [orderSearch, setOrderSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -53,6 +57,25 @@ export default function AdminDashboardPage() {
   // Course editing state
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isCreatingCourse, setIsCreatingCourse] = useState(false);
+
+  // Course edit form state
+  const [editForm, setEditForm] = useState<{
+    title: string;
+    slug: string;
+    segment: SegmentType;
+    platform: string;
+    description: string;
+    shortDescription: string;
+    badge: string;
+    originalPrice: string;
+    price: string;
+    driveUrl: string;
+    features: string;
+    folderSize: string;
+    totalFiles: string;
+    coverGradient: string;
+    active: boolean;
+  } | null>(null);
 
   // Settings editing state
   const [localSettings, setLocalSettings] = useState(settings);
@@ -121,6 +144,110 @@ export default function AdminDashboardPage() {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2500);
+  };
+
+  // Course edit form handlers
+  const openEditCourse = (course: Course) => {
+    setEditForm({
+      title: course.title,
+      slug: course.slug,
+      segment: course.segment,
+      platform: course.platform,
+      description: course.description,
+      shortDescription: course.shortDescription || "",
+      badge: course.badge || "",
+      originalPrice: String(course.originalPrice),
+      price: String(course.price),
+      driveUrl: course.driveUrl,
+      features: course.features.join("\n"),
+      folderSize: course.folderSize,
+      totalFiles: course.totalFiles,
+      coverGradient: course.coverGradient,
+      active: course.active,
+    });
+    setEditingCourse(course);
+    setIsCreatingCourse(false);
+  };
+
+  const handleEditChange = (key: string, value: string) => {
+    if (!editForm) return;
+    setEditForm({ ...editForm, [key]: value });
+  };
+
+  const handleEditFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (!editForm) return;
+    setEditForm({
+      ...editForm,
+      features: e.target.value,
+    });
+  };
+
+  const handleSaveEditCourse = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editForm) return;
+
+    const featuresArray = editForm.features
+      .split("\n")
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0);
+
+    const courseData = {
+      title: editForm.title,
+      slug: editForm.slug,
+      segment: editForm.segment as SegmentType,
+      platform: editForm.platform,
+      description: editForm.description,
+      shortDescription: editForm.shortDescription || undefined,
+      badge: editForm.badge || undefined,
+      originalPrice: parseFloat(editForm.originalPrice) || 0,
+      price: parseFloat(editForm.price) || 0,
+      driveUrl: editForm.driveUrl,
+      features: featuresArray,
+      folderSize: editForm.folderSize,
+      totalFiles: editForm.totalFiles,
+      coverGradient: editForm.coverGradient,
+      active: editForm.active === "true",
+      updatedAt: new Date().toISOString(),
+    } as Partial<Course> & { segment: SegmentType };
+
+    if (editingCourse) {
+      const updated: Course = {
+        ...editingCourse,
+        ...courseData,
+        id: editingCourse.id,
+      };
+      updateCourse(updated);
+    } else {
+      const newCourse: Course = {
+        ...courseData,
+        id: `course-${Date.now()}`,
+        slug: editForm.slug || `curso-${Date.now()}`,
+        title: editForm.title || "Novo Curso",
+        segment: editForm.segment as SegmentType,
+        platform: editForm.platform || "",
+        description: editForm.description || "",
+        originalPrice: parseFloat(editForm.originalPrice) || 0,
+        price: parseFloat(editForm.price) || 0,
+        driveUrl: editForm.driveUrl || "",
+        features: featuresArray,
+        folderSize: editForm.folderSize || "0 GB",
+        totalFiles: editForm.totalFiles || "0 Arquivos",
+        updatedAt: new Date().toISOString(),
+        active: editForm.active === "true",
+        coverGradient: editForm.coverGradient || "from-indigo-600 to-purple-600",
+        stockStatus: "in_stock",
+      };
+      addCourse(newCourse);
+    }
+
+    setEditForm(null);
+    setEditingCourse(null);
+    setIsCreatingCourse(false);
+  };
+
+  const closeEditCourse = () => {
+    setEditForm(null);
+    setEditingCourse(null);
   };
 
   // Save Settings
@@ -328,6 +455,18 @@ export default function AdminDashboardPage() {
           <Settings className="w-4 h-4 text-emerald-400" />
           <span>Configurações & Chave PIX</span>
         </button>
+
+        <button
+          onClick={() => setActiveTab("clientes")}
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition ${
+            activeTab === "clientes"
+              ? "border-purple-500 text-white"
+              : "border-transparent text-gray-400 hover:text-gray-200"
+          }`}
+        >
+          <Users className="w-4 h-4 text-cyan-400" />
+          <span>Clientes & Alunos</span>
+        </button>
       </div>
 
       {/* TAB 1: SALES & ORDERS */}
@@ -485,6 +624,23 @@ export default function AdminDashboardPage() {
                                 <MessageCircle className="w-3.5 h-3.5" />
                               </a>
                             )}
+
+                            {/* Remover pedido / cliente */}
+                            <button
+                              onClick={() => {
+                                if (
+                                  confirm(
+                                    `Remover o pedido ${ord.id} do aluno ${ord.studentName}? Esta ação não pode ser desfeita.`
+                                  )
+                                ) {
+                                  deleteOrder(ord.id);
+                                }
+                              }}
+                              className="p-1 rounded text-rose-400 hover:bg-rose-500/10 transition"
+                              title="Excluir pedido e remover cliente"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -506,6 +662,23 @@ export default function AdminDashboardPage() {
               onClick={() => {
                 setEditingCourse(null);
                 setIsCreatingCourse(true);
+                setEditForm({
+                  title: "",
+                  slug: "",
+                  segment: "fiscal",
+                  platform: "",
+                  description: "",
+                  shortDescription: "",
+                  badge: "",
+                  originalPrice: "",
+                  price: "",
+                  driveUrl: "",
+                  features: "",
+                  folderSize: "",
+                  totalFiles: "",
+                  coverGradient: "from-indigo-600 to-purple-600",
+                  active: true,
+                });
               }}
               className="py-2 px-3.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition"
             >
@@ -562,14 +735,12 @@ export default function AdminDashboardPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => {
-                        const newDrive = prompt("Atualizar Link do Google Drive:", c.driveUrl);
-                        if (newDrive !== null) {
-                          updateCourse({ ...c, driveUrl: newDrive });
-                        }
+                        setEditingCourse(c);
+                        setIsCreatingCourse(false);
                       }}
-                      className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-gray-300 hover:text-white transition"
+                      className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-indigo-300 hover:text-white transition"
                     >
-                      Alterar Drive
+                      <Edit3 className="w-3 h-3" /> Editar
                     </button>
                     <button
                       onClick={() => {
@@ -586,6 +757,228 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Course Edit / Create Modal */}
+      {(editingCourse || isCreatingCourse) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="w-full max-w-2xl bg-[#0c101d] border border-white/10 rounded-3xl shadow-2xl overflow-hidden my-8">
+            <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-white">
+                {isCreatingCourse ? "Novo Curso" : "Editar Curso"}
+              </h3>
+              <button
+                onClick={closeEditCourse}
+                className="p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditCourse} className="p-5 sm:p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Nome do Curso
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm?.title || ""}
+                    onChange={(e) => handleEditChange("title", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Slug (URL amigável)
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm?.slug || ""}
+                    onChange={(e) => handleEditChange("slug", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Segmento
+                  </label>
+                  <select
+                    value={editForm?.segment || "fiscal"}
+                    onChange={(e) => handleEditChange("segment", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="fiscal">Área Fiscal</option>
+                    <option value="tribunais">Tribunais</option>
+                    <option value="combos">Combos VIP</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Plataforma (ex: Estratégia, Gran, Direção)
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm?.platform || ""}
+                    onChange={(e) => handleEditChange("platform", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Descrição
+                </label>
+                <textarea
+                  value={editForm?.description || ""}
+                  onChange={(e) => handleEditChange("description", e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Descrição Curta
+                </label>
+                <input
+                  type="text"
+                  value={editForm?.shortDescription || ""}
+                  onChange={(e) => handleEditChange("shortDescription", e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Selo (ex: Mais Vendido, Edital 2026)
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm?.badge || ""}
+                    onChange={(e) => handleEditChange("badge", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Gradiente da Capa (ex: from-indigo-600 to-purple-600)
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm?.coverGradient || ""}
+                    onChange={(e) => handleEditChange("coverGradient", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Preço Promocional (R$)
+                  </label>
+                  <input
+                    type="number"
+                    value={editForm?.price || ""}
+                    onChange={(e) => handleEditChange("price", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Preço Original (R$)
+                  </label>
+                  <input
+                    type="number"
+                    value={editForm?.originalPrice || ""}
+                    onChange={(e) => handleEditChange("originalPrice", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Tamanho da Pasta (ex: 140 GB)
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm?.folderSize || ""}
+                    onChange={(e) => handleEditChange("folderSize", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                    Total de Arquivos (ex: +1.400 Aulas)
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm?.totalFiles || ""}
+                    onChange={(e) => handleEditChange("totalFiles", e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Link do Google Drive
+                </label>
+                <input
+                  type="text"
+                  value={editForm?.driveUrl || ""}
+                  onChange={(e) => handleEditChange("driveUrl", e.target.value)}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Funcionalidades (uma por linha)
+                </label>
+                <textarea
+                  value={editForm?.features || ""}
+                  onChange={handleEditFeaturesChange}
+                  rows={4}
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editForm?.active !== false}
+                    onChange={(e) =>
+                      handleEditChange("active", e.target.checked ? "true" : "false")
+                    }
+                    className="rounded border-white/20 bg-surface-200 text-indigo-600 focus:ring-0"
+                  />
+                  <span className="text-xs font-semibold text-gray-300">Ativo no Site</span>
+                </label>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={closeEditCourse}
+                  className="px-4 py-2.5 rounded-xl font-bold text-xs text-gray-300 bg-white/5 hover:bg-white/10 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition"
+                >
+                  {isCreatingCourse ? "Criar Curso" : "Salvar Alterações"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -806,6 +1199,109 @@ export default function AdminDashboardPage() {
             <span>Salvar Todas as Configurações</span>
           </button>
         </form>
+      )}
+
+      {/* TAB 4: CLIENTES & ALUNOS */}
+      {activeTab === "clientes" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-white">Clientes & Alunos Cadastrados</h3>
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              {getUniqueStudents().length} alunos únicos
+            </span>
+          </div>
+
+          <div className="overflow-x-auto rounded-2xl border border-white/10 bg-surface-100/60 shadow-xl">
+            <table className="w-full text-left text-xs text-gray-300">
+              <thead className="bg-white/5 text-gray-400 uppercase text-[10px] font-bold border-b border-white/10">
+                <tr>
+                  <th className="py-3 px-4">Aluno</th>
+                  <th className="py-3 px-4">E-mail (Gmail Drive)</th>
+                  <th className="py-3 px-4 text-center">WhatsApp</th>
+                  <th className="py-3 px-4 text-center">Pedidos</th>
+                  <th className="py-3 px-4 text-center">Total Gasto</th>
+                  <th className="py-3 px-4 text-center">Último Pedido</th>
+                  <th className="py-3 px-4 text-center">Status Último</th>
+                  <th className="py-3 px-4 text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {getUniqueStudents().length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="text-center py-10 text-gray-400">
+                      Nenhum aluno cadastrado.
+                    </td>
+                  </tr>
+                ) : (
+                  getUniqueStudents().map((s) => (
+                    <tr key={s.email} className="hover:bg-white/[0.02]">
+                      <td className="py-3.5 px-4">
+                        <strong className="text-white block font-medium">{s.name}</strong>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="text-indigo-400 font-mono select-all text-[11px] block">{s.email}</span>
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        {s.whatsapp ? (
+                          <a
+                            href={`https://wa.me/55${s.whatsapp.replace(/\D/g, "")}?text=Ol%C3%A1%20${encodeURIComponent(s.name)}!`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-400 hover:text-emerald-300 text-xs font-medium"
+                          >
+                            {s.whatsapp}
+                          </a>
+                        ) : (
+                          <span className="text-gray-500 text-[11px]">—</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        <span className="px-2 py-1 rounded bg-white/5 text-[10px] font-bold">{s.totalOrders}</span>
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        <span className="text-[10px] font-bold text-white">R$ {s.totalSpent.toFixed(2)}</span>
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        <span className="font-mono text-[10px] text-gray-400">{s.lastOrderId}</span>
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        <span
+                          className={`px-2 py-1 rounded-full text-[10px] font-bold ${
+                            s.lastOrderStatus === "PAID"
+                              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                              : s.lastOrderStatus === "PENDING"
+                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                              : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                          }`}
+                        >
+                          {s.lastOrderStatus === "PAID" ? "Pago" : s.lastOrderStatus === "PENDING" ? "Pendente" : "Entregue"}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-center">
+                        <button
+                          onClick={() => {
+                            if (confirm(`Remover aluno "${s.name}" (${s.email}) e todos os seus pedidos? Esta ação não pode ser desfeita.`)) {
+                              deleteStudent(s.email);
+                            }
+                          }}
+                          className="p-1.5 rounded text-rose-400 hover:bg-rose-500/10 transition"
+                          title="Excluir aluno e todos os pedidos"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-surface-100/40 border border-white/5 text-xs text-gray-400">
+            <p className="mb-1"><span className="font-bold text-white">Como funciona:</span> A lista é gerada automaticamente a partir dos pedidos feitos no site.</p>
+            <p>Ao remover um aluno, todos os pedidos vinculados ao seu e-mail são excluídos juntamente com o cadastro.</p>
+          </div>
+        </div>
       )}
 
     </div>

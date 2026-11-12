@@ -13,6 +13,7 @@ import {
   Download
 } from "lucide-react";
 import { SegmentType } from "@/types";
+import { TextType } from "@/components/reactbits/TextType";
 
 export function Hero() {
   const { 
@@ -49,11 +50,20 @@ export function Hero() {
         </div>
 
         {/* Hero Main Headline */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto">
-          Os Melhores Cursos de Concurso{" "}
-          <span className="text-gradient">no seu Google Drive</span>{" "}
-          com Acesso Vitalício
-        </h1>
+        <div className="max-w-4xl mx-auto">
+          <TextType
+            words={[
+              "Os Melhores Cursos de Concurso no seu Google Drive",
+              "Acesso Vitalício sem Mensalidade",
+              "Pastas Atualizadas para 2026",
+              "Envio no Gmail em até 24h após o PIX",
+            ]}
+            typingSpeed={70}
+            deletingSpeed={35}
+            pauseDuration={2200}
+            className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight block"
+          />
+        </div>
 
         {/* Subtitle with 24 hours */}
         <p className="mt-5 text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">

@@ -23,8 +23,21 @@ interface StoreContextType {
     studentName: string;
     studentEmail: string;
     studentWhatsapp?: string;
+    studentCpf?: string;
   }) => Promise<Order>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
+  deleteOrder: (orderId: string) => void;
+  clearTestOrders: () => void;
+  getUniqueStudents: () => Array<{
+    name: string;
+    email: string;
+    whatsapp?: string;
+    totalOrders: number;
+    totalSpent: number;
+    lastOrderId: string;
+    lastOrderStatus: OrderStatus;
+  }>;
+  deleteStudent: (studentEmail: string) => void;
   simulatePaymentApproval: (orderId: string) => void;
   markOrderDelivered: (orderId: string) => void;
   updateOrderStudentEmail: (orderId: string, newEmail: string) => void;
@@ -157,6 +170,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           nome: data.studentName.trim(),
           email: data.studentEmail.trim().toLowerCase(),
           whatsapp: data.studentWhatsapp?.trim() || "",
+          cpf: data.studentCpf?.trim() || "",
+          courseTitle: course.title,
+          coursePrice: course.price,
+          courseDriveUrl: course.driveUrl,
+          courseSegment: course.segment,
         }),
       });
 
@@ -270,6 +288,53 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const deleteOrder = (orderId: string) => {
+    setOrders((prev) => prev.filter((o) => o.id !== orderId));
+  };
+
+  // Unique students extracted from orders (for client management)
+  const getUniqueStudents = () => {
+    const seen = new Set<string>();
+    const students: Array<{
+      name: string;
+      email: string;
+      whatsapp?: string;
+      totalOrders: number;
+      totalSpent: number;
+      lastOrderId: string;
+      lastOrderStatus: OrderStatus;
+    }> = [];
+    const sorted = [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    for (const o of sorted) {
+      const key = o.studentEmail.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const userOrders = orders.filter((x) => x.studentEmail.toLowerCase() === key);
+      students.push({
+        name: o.studentName,
+        email: o.studentEmail,
+        whatsapp: o.studentWhatsapp,
+        totalOrders: userOrders.length,
+        totalSpent: userOrders.reduce((acc, x) => acc + x.amount, 0),
+        lastOrderId: o.id,
+        lastOrderStatus: o.status,
+      });
+    }
+    return students;
+  };
+
+  const deleteStudent = (studentEmail: string) => {
+    const clean = studentEmail.trim().toLowerCase();
+    setOrders((prev) => prev.filter((o) => o.studentEmail.toLowerCase() !== clean));
+    if (currentUser && currentUser.email.toLowerCase() === clean) {
+      setCurrentUser(null);
+    }
+  };
+
+  const clearTestOrders = () => {
+    setOrders((prev) => prev.filter((o) => o.status === "PAID" || o.status === "DELIVERED"));
+  };
+
   const addCourse = (courseData: Omit<Course, "id">) => {
     const newCourse: Course = {
       ...courseData,
@@ -332,6 +397,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         closeCheckout,
         createOrder,
         updateOrderStatus,
+        deleteOrder,
+        clearTestOrders,
+        getUniqueStudents,
+        deleteStudent,
         simulatePaymentApproval,
         markOrderDelivered,
         updateOrderStudentEmail,

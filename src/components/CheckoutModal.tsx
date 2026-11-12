@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useStore } from "@/context/StoreContext";
 import { formatCurrency } from "@/lib/utils";
@@ -27,19 +27,56 @@ export function CheckoutModal() {
     createOrder, 
     settings,
     simulatePaymentApproval,
-    loginAsStudent
+    loginAsStudent,
+    updateOrderStatus
   } = useStore();
 
   const [step, setStep] = useState<"form" | "pix">("form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [cpf, setCpf] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [copied, setCopied] = useState(false);
   const [isPaidSimulated, setIsPaidSimulated] = useState(false);
 
+  // Polling em tempo real para verificar confirmação automática do PIX
+  useEffect(() => {
+    if (step !== "pix" || !order || isPaidSimulated) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/orders/status?orderId=${encodeURIComponent(order.id)}&txId=${encodeURIComponent(order.veloraTransactionId || "")}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.paid) {
+            updateOrderStatus(order.id, "PAID");
+            setIsPaidSimulated(true);
+            loginAsStudent(order.studentEmail, order.studentName);
+          }
+        }
+      } catch (err) {
+        // silent error during status polling
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [step, order, isPaidSimulated, updateOrderStatus, loginAsStudent]);
+
   if (!selectedCourseForCheckout) return null;
+
+  const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let v = e.target.value.replace(/\D/g, "").slice(0, 11);
+    if (v.length > 9) {
+      v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
+    } else if (v.length > 6) {
+      v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+    } else if (v.length > 3) {
+      v = v.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+    }
+    setCpf(v);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +89,7 @@ export function CheckoutModal() {
         studentName: name,
         studentEmail: email,
         studentWhatsapp: whatsapp,
+        studentCpf: cpf,
       });
 
       setOrder(newOrder);
@@ -66,9 +104,22 @@ export function CheckoutModal() {
 
   const handleCopyPix = () => {
     if (!order) return;
-    navigator.clipboard.writeText(order.pixCopyPaste);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(order.pixCopyPaste);
+      } else {
+        const el = document.createElement("textarea");
+        el.value = order.pixCopyPaste;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 4000);
+    } catch {
+      setCopied(true);
+    }
   };
 
   const handleSimulatePayment = () => {
@@ -198,6 +249,19 @@ export function CheckoutModal() {
               />
             </div>
 
+            <div>
+              <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                CPF do Titular (Opcional - para registro bancário PIX)
+              </label>
+              <input
+                type="text"
+                value={cpf}
+                onChange={handleCpfChange}
+                placeholder="000.000.000-00"
+                className="w-full px-4 py-3 rounded-xl bg-surface-100 border border-white/10 text-white placeholder-gray-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition font-mono"
+              />
+            </div>
+
             <div className="flex items-center justify-center gap-1.5 text-[11px] text-gray-400 pt-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>Processado com segurança via <strong className="text-white font-semibold">VeloraPay</strong> • PIX Instantâneo</span>
@@ -265,75 +329,105 @@ export function CheckoutModal() {
               <>
                 {/* QR Code Container */}
                 <div className="flex flex-col items-center">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-semibold mb-2.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Aguardando Pagamento • Confirmação Automática</span>
+                  </div>
                   <p className="text-xs text-gray-300 mb-2">
-                    Escaneie o QR Code no seu banco para pagar:
+                    Escaneie o QR Code no seu aplicativo bancário:
                   </p>
-                  <div className="p-3 bg-white rounded-2xl shadow-xl inline-block border-2 border-indigo-500/30">
+                  <div className="p-3.5 bg-white rounded-2xl shadow-2xl inline-block border-2 border-indigo-500/40">
                     {order.pixQrCodeUrl ? (
                       <Image
                         src={order.pixQrCodeUrl}
                         alt="QR Code PIX"
-                        width={190}
-                        height={190}
+                        width={210}
+                        height={210}
                         unoptimized
-                        className="w-44 h-44 block mx-auto rounded-lg"
+                        className="w-52 h-52 block mx-auto rounded-lg"
                       />
                     ) : (
-                      <div className="w-44 h-44 flex items-center justify-center text-xs text-black">
-                        Gerando QR Code...
+                      <div className="w-52 h-52 flex items-center justify-center text-xs text-black font-semibold">
+                        Gerando QR Code Oficial...
                       </div>
                     )}
                   </div>
-                  <div className="mt-2.5 flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <div className="mt-2.5 flex items-center gap-1.5 text-sm text-emerald-400 font-extrabold">
+                    <Sparkles className="w-4 h-4" />
                     <span>Valor a pagar: {formatCurrency(order.amount)}</span>
                   </div>
                 </div>
 
                 {/* Copia e Cola Field */}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1 text-left">
-                    Ou copie o código PIX Copia e Cola:
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-gray-300">
+                      Ou copie o código PIX Copia e Cola:
+                    </label>
+                    {copied && (
+                      <span className="text-[11px] font-bold text-emerald-400 animate-bounce">
+                        ✓ Copiado com sucesso!
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       readOnly
                       value={order.pixCopyPaste}
-                      className="w-full px-3 py-2.5 rounded-xl bg-surface-100 border border-white/10 text-gray-300 text-xs font-mono truncate focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-surface-100 border border-white/10 text-gray-200 text-xs font-mono truncate focus:outline-none focus:border-indigo-500"
                     />
                     <button
                       type="button"
                       onClick={handleCopyPix}
-                      className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shrink-0 transition flex items-center gap-1.5"
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shrink-0 transition flex items-center gap-1.5 shadow-md shadow-indigo-600/30 cursor-pointer"
                     >
                       {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-                      <span>{copied ? "Copiado!" : "Copiar"}</span>
+                      <span>{copied ? "Copiado!" : "Copiar PIX"}</span>
                     </button>
                   </div>
+                  {copied && (
+                    <div className="mt-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-left text-xs text-emerald-300">
+                      Código PIX copiado! Agora abra o app do seu banco e escolha a opção <strong>Pix Copia e Cola</strong>.
+                    </div>
+                  )}
                 </div>
 
                 {/* Clear instructions */}
-                <div className="text-left text-xs text-gray-300 bg-surface-100/60 p-3.5 rounded-xl border border-white/5 space-y-1">
-                  <p className="text-white font-semibold mb-1 flex items-center gap-1.5">
+                <div className="text-left text-xs text-gray-300 bg-surface-100/60 p-3.5 rounded-xl border border-white/5 space-y-1.5">
+                  <p className="text-white font-semibold flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Prazo e envio do Drive:</span>
+                    <span>Como funciona a liberação:</span>
                   </p>
-                  <p>1. Copie o código acima e pague no app do seu banco.</p>
-                  <p>2. Assim que o pagamento for confirmado, adicionaremos o Gmail <strong>{order.studentEmail}</strong> à pasta.</p>
-                  <p>3. O envio é realizado em <strong>até 24 horas</strong> após a compra.</p>
+                  <p>1. Efetue o pagamento pelo QR Code ou Copia e Cola.</p>
+                  <p>2. O sistema reconhece o pagamento automaticamente e notifica em instantes.</p>
+                  <p>3. Seu e-mail <strong className="text-white">{order.studentEmail}</strong> receberá o convite para a pasta no Google Drive em <strong>até 24 horas</strong>.</p>
                 </div>
 
-                {/* WhatsApp Receipt Button */}
-                <a
-                  href={`https://wa.me/${cleanWhatsappNumber}?text=${whatsappReceiptMessage}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
-                >
-                  <MessageCircle className="w-4 h-4 text-emerald-400" />
-                  <span>Enviar Comprovante pelo WhatsApp</span>
-                </a>
+                {/* Direct WhatsApp Support */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  <a
+                    href={`https://wa.me/${cleanWhatsappNumber}?text=${whatsappReceiptMessage}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
+                  >
+                    <MessageCircle className="w-4 h-4 text-emerald-400" />
+                    <span>Dúvidas no WhatsApp</span>
+                  </a>
+
+                  {settings.telegramSupport && (
+                    <a
+                      href={settings.telegramSupport}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition flex items-center justify-center gap-1.5"
+                    >
+                      <Sparkles className="w-4 h-4 text-cyan-400" />
+                      <span>Canal no Telegram</span>
+                    </a>
+                  )}
+                </div>
 
                 {/* Demo / Test Simulation button */}
                 <div className="pt-2 border-t border-white/5">
