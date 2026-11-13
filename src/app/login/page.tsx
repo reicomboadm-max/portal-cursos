@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Mail, Lock, User as UserIcon, AlertTriangle } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,10 +44,7 @@ export default function LoginPage() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <Link href="/" className="flex items-center justify-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-cyan flex items-center justify-center text-white font-bold shadow-neon">
-                P
-              </div>
-              <span className="text-xl font-bold">Portal Cursos</span>
+              <BrandLogo size={42} showText={true} />
             </Link>
             <h2 className="text-2xl font-bold text-white mb-2">
               {mode === "login" ? "Entrar na sua conta" : "Criar sua conta"}

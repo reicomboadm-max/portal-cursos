@@ -14,6 +14,7 @@ import {
   Globe,
   Target,
 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const ADMIN_EMAILS = ["admin@seuemail.com", "admin2@seuemail.com"];
 
@@ -31,14 +32,9 @@ export default function Navbar({ user, onLogin, onLogout }: NavbarProps) {
     <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-surface-100/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-cyan flex items-center justify-center text-white font-bold shadow-neon">
-              P
-            </div>
-            <Link href="/" className="text-xl font-bold tracking-tight text-white">
-              Portal Cursos
-            </Link>
-          </div>
+          <Link href="/" className="flex items-center gap-3">
+            <BrandLogo size={36} showText={true} />
+          </Link>
 
           <div className="hidden md:flex items-center gap-8">
             <Link
