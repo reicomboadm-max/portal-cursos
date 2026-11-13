@@ -205,88 +205,91 @@ export default function HomePage() {
             </button>
           </div>
         ) : (
-          /* Cards Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          /* Cards Grid - Colunas menores e mais compactas (4 colunas no desktop) */
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredCourses.map((course) => {
               return (
                 <div
                   key={course.id}
                   className="group rounded-2xl border border-slate-800 bg-[#111827] hover:border-slate-700 hover:shadow-xl transition-all duration-200 flex flex-col justify-between overflow-hidden"
                 >
-                  <div className="p-6">
-                    {/* Top tags row - NO Estratégia name! */}
-                    <div className="flex items-center justify-between gap-2 mb-3.5">
-                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-md border ${getBadgeStyle(course.segment)}`}>
+                  <div className="p-4 sm:p-4.5">
+                    {/* Top tags row */}
+                    <div className="flex items-center justify-between gap-1.5 mb-2.5">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getBadgeStyle(course.segment)}`}>
                         {getAreaLabel(course.segment)}
                       </span>
 
-                      <span className="text-[11px] font-semibold text-slate-400 bg-slate-800/80 px-2.5 py-0.5 rounded border border-slate-700 truncate max-w-[160px]">
+                      <span className="text-[10px] font-semibold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700 truncate max-w-[140px]">
                         {course.platform}
                       </span>
                     </div>
 
                     {/* Course Title */}
-                    <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-2">
+                    <h3 
+                      className="text-sm sm:text-[15px] font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-1.5 line-clamp-2 min-h-[2.6rem]"
+                      title={course.title}
+                    >
                       {course.title}
                     </h3>
 
                     {/* Short Description */}
-                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">
+                    <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed mb-3">
                       {course.shortDescription || course.description}
                     </p>
 
                     {/* Specs: Folder Size & Files */}
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                      <div className="flex items-center gap-1.5 p-2 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300">
+                    <div className="grid grid-cols-2 gap-1.5 mb-3">
+                      <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-[10.5px] text-slate-300">
                         <HardDrive className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         <span className="truncate">{course.folderSize}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 p-2 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300">
+                      <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-[10.5px] text-slate-300">
                         <Video className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                         <span className="truncate">{course.totalFiles}</span>
                       </div>
                     </div>
 
                     {/* Included Features Bullet Points */}
-                    <div className="space-y-1.5 mb-4 border-t border-slate-800 pt-3.5">
-                      {course.features.slice(0, 3).map((feat, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs text-slate-300">
+                    <div className="space-y-1 mb-3 border-t border-slate-800/80 pt-2.5">
+                      {course.features.slice(0, 2).map((feat, i) => (
+                        <div key={i} className="flex items-start gap-1.5 text-[11px] text-slate-300">
                           <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                          <span className="leading-snug">{feat}</span>
+                          <span className="leading-tight line-clamp-1">{feat}</span>
                         </div>
                       ))}
                     </div>
 
                     {/* Delivery notice tag */}
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-medium text-emerald-400 mb-2">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10.5px] font-medium text-emerald-400 mb-1">
                       <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>Convite enviado no seu Gmail em até 24h</span>
+                      <span className="truncate">Convite no seu Gmail em até 24h</span>
                     </div>
                   </div>
 
                   {/* Card Footer: Pricing and CTA */}
-                  <div className="p-6 pt-0 mt-auto">
-                    <div className="flex items-baseline justify-between mb-4 border-t border-slate-800 pt-3.5">
+                  <div className="p-4 sm:p-4.5 pt-0 mt-auto">
+                    <div className="flex items-baseline justify-between mb-3 border-t border-slate-800/80 pt-2.5">
                       <div>
                         {course.originalPrice > course.price && (
-                          <span className="text-xs text-slate-500 line-through block">
+                          <span className="text-[10px] text-slate-500 line-through block">
                             {formatCurrency(course.originalPrice)}
                           </span>
                         )}
-                        <span className="text-2xl font-black text-white">
+                        <span className="text-xl sm:text-2xl font-black text-white">
                           {formatCurrency(course.price)}
                         </span>
-                        <span className="text-[10px] text-slate-400 block font-medium">
+                        <span className="text-[9.5px] text-slate-400 block font-medium">
                           Pagamento único via PIX
                         </span>
                       </div>
 
                       <div className="text-right">
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-                          <Star className="w-3 h-3 fill-amber-400" />
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
+                          <Star className="w-2.5 h-2.5 fill-amber-400" />
                           {course.rating || 4.9}
                         </span>
-                        <span className="text-[10px] text-slate-400 block mt-0.5">
+                        <span className="text-[9.5px] text-slate-400 block mt-0.5">
                           {course.reviewsCount || 120} alunos
                         </span>
                       </div>
@@ -295,10 +298,10 @@ export default function HomePage() {
                     {/* CTA Button */}
                     <button
                       onClick={() => openCheckout(course)}
-                      className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wide shadow-md shadow-emerald-900/30 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                      className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wide shadow-md shadow-emerald-900/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]"
                     >
-                      <Zap className="w-4 h-4 fill-white" />
-                      <span>Comprar Acesso no Drive</span>
+                      <Zap className="w-3.5 h-3.5 fill-white" />
+                      <span>Comprar Acesso</span>
                     </button>
                   </div>
 

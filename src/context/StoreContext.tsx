@@ -56,10 +56,30 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const COURSES_STORAGE_KEY = "concurso_courses_v5";
+const COURSES_STORAGE_KEY = "concurso_courses_v6";
 const ORDERS_STORAGE_KEY = "concurso_orders_v2";
 const SETTINGS_STORAGE_KEY = "concurso_settings_v2";
 const USER_STORAGE_KEY = "concurso_current_user_v2";
+
+function sanitizeText(str: string): string {
+  if (!str) return str;
+  return str
+    .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/\\([áàãâéêíóôõúüçÁÀÃÂÉÊÍÓÔÕÚÜÇ])/g, '$1');
+}
+
+function sanitizeCourse(c: Course): Course {
+  return {
+    ...c,
+    title: sanitizeText(c.title),
+    description: sanitizeText(c.description),
+    shortDescription: sanitizeText(c.shortDescription),
+    platform: sanitizeText(c.platform),
+    folderSize: sanitizeText(c.folderSize),
+    totalFiles: sanitizeText(c.totalFiles),
+    features: Array.isArray(c.features) ? c.features.map(sanitizeText) : c.features
+  };
+}
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [courses, setCourses] = useState<Course[]>(initialCourses);
@@ -85,13 +105,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("concurso_courses_v2");
       localStorage.removeItem("concurso_courses_v3");
       localStorage.removeItem("concurso_courses_v4");
+      localStorage.removeItem("concurso_courses_v5");
 
       const storedCourses = localStorage.getItem(COURSES_STORAGE_KEY);
       if (storedCourses) {
         const parsed = JSON.parse(storedCourses);
-        // Ensure no leftover combos in stored list
+        // Ensure no leftover combos in stored list and all characters are decoded
         const cleanList = Array.isArray(parsed) 
-          ? parsed.filter((c: Course) => c.segment !== ("combos" as any) && !c.title.toLowerCase().startsWith("combo"))
+          ? parsed
+              .filter((c: Course) => c.segment !== ("combos" as any) && !c.title.toLowerCase().startsWith("combo"))
+              .map(sanitizeCourse)
           : [];
 
         if (cleanList.length >= initialCourses.length) {

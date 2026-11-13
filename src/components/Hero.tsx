@@ -13,6 +13,7 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { SegmentType } from "@/types";
+import MaskedHeading from "./reactbits/MaskedHeading";
 
 export function Hero() {
   const { 
@@ -48,11 +49,29 @@ export function Hero() {
           <span>PASTAS ATUALIZADAS NO GOOGLE DRIVE • ANO 2026</span>
         </div>
 
-        {/* Hero Main Headline */}
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight block">
-            Cursos Completos no seu Google Drive
-          </h1>
+        {/* Hero Main Headline with MaskedHeading */}
+        <div className="max-w-4xl mx-auto my-3">
+          <MaskedHeading
+            text="Cursos no Google Drive"
+            tag="h1"
+            mediaType="image"
+            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1400&auto=format&fit=crop"
+            fillScale={1.3}
+            parallax={24}
+            reveal="scale"
+            trigger="view"
+            spotlight={true}
+            spotlightRadius={160}
+            outline={true}
+            outlineColor="rgba(16, 185, 129, 0.45)"
+            outlineWidth={1}
+            weight={900}
+            textScale={0.075}
+            className="tracking-tight text-white drop-shadow"
+          />
+          <h2 className="text-xl sm:text-2xl font-black text-emerald-400 mt-2 tracking-tight">
+            Acervo Completo & Atualizado 2026
+          </h2>
         </div>
 
         {/* Subtitle */}
