@@ -6,6 +6,7 @@ import { useStore } from "@/context/StoreContext";
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { FluxoraBackground } from "@/components/FluxoraBackground";
 import StarBorder from "@/components/reactbits/StarBorder";
+import GooeyNav from "@/components/reactbits/GooeyNav";
 import Footer from "@/components/Footer";
 import { 
   Search, 
@@ -57,14 +58,34 @@ export default function HomePage() {
     });
   }, [courses, activeSegmentFilter, searchQuery]);
 
-  const categories: { id: SegmentType | "todos"; label: string; icon: string }[] = [
+  const categories: { id: SegmentType | "todos"; label: string; icon: string }[] = useMemo(() => [
     { id: "todos", label: "Todos", icon: "📚" },
     { id: "fiscal", label: "Fiscal & Tributário", icon: "🏛️" },
     { id: "policial", label: "Carreiras Policiais", icon: "🛡️" },
     { id: "tribunais", label: "Tribunais & MP", icon: "⚖️" },
     { id: "administrativo", label: "Admin & Bancos", icon: "🏢" },
     { id: "disciplinas", label: "Professores & Isoladas", icon: "⭐" },
-  ];
+  ], []);
+
+  const gooeyItems = useMemo(() => {
+    return categories.map((cat) => ({
+      id: cat.id,
+      label: (
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+          <span>{cat.icon}</span>
+          <span>{cat.label}</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 font-mono font-bold">
+            {counts[cat.id] || 0}
+          </span>
+        </span>
+      ),
+    }));
+  }, [categories, counts]);
+
+  const activeCategoryIndex = useMemo(() => {
+    const idx = categories.findIndex((c) => c.id === activeSegmentFilter);
+    return idx >= 0 ? idx : 0;
+  }, [categories, activeSegmentFilter]);
 
   const getSectionTitle = () => {
     switch (activeSegmentFilter) {
@@ -135,31 +156,30 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Categories Filter Pills */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            {categories.map((cat) => {
-              const isActive = activeSegmentFilter === cat.id;
-              const count = counts[cat.id] || 0;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveSegmentFilter(cat.id)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                    isActive
-                      ? "bg-white text-black font-semibold shadow-md shadow-white/10"
-                      : "bg-white/5 text-neutral-300 hover:text-white hover:bg-white/10 border border-white/10"
-                  }`}
-                >
-                  <span>{cat.icon}</span>
-                  <span>{cat.label}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                    isActive ? "bg-black/10 text-black font-bold" : "bg-white/10 text-neutral-400"
-                  }`}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+          {/* Categories Filter (GooeyNav React Bits) */}
+          <div className="mt-6 flex justify-center max-w-full overflow-x-auto py-2">
+            <GooeyNav
+              items={gooeyItems}
+              activeIndex={activeCategoryIndex}
+              onChange={(index) => {
+                if (categories[index]) {
+                  setActiveSegmentFilter(categories[index].id);
+                }
+              }}
+              theme="dark"
+              size="sm"
+              color="#ffffff"
+              activeTextColor="#000000"
+              colors={["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7"]}
+              frame={true}
+              particleCount={15}
+              spread={48}
+              animationTime={600}
+              timeVariance={300}
+              gooeyness={0.5}
+              wobble={0.5}
+              hoverEffect={true}
+            />
           </div>
         </div>
 

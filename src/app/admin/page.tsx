@@ -83,6 +83,7 @@ export default function AdminDashboardPage() {
   // Settings editing state
   const [localSettings, setLocalSettings] = useState(settings);
   const [settingsSaved, setSettingsSaved] = useState(false);
+  const [adminEmail, setAdminEmail] = useState("reicomboadm@gmail.com");
 
   // Check saved admin session
   useEffect(() => {
@@ -90,6 +91,7 @@ export default function AdminDashboardPage() {
       const saved = localStorage.getItem("admin_authenticated_email");
       if (saved) {
         setIsAuthenticated(true);
+        setAdminEmail(saved);
       }
     }
   }, []);
@@ -100,16 +102,22 @@ export default function AdminDashboardPage() {
     const cleanPass = adminPassInput.trim();
     const isAuthorized =
       cleanPass.toLowerCase() === "reicomboadm@gmail.com" ||
+      cleanPass.toLowerCase() === "gptdoscriasstpg@gmail.com" ||
+      cleanPass.toLowerCase() === "reicomboadm" ||
+      cleanPass.toLowerCase() === "gptdoscriasstpg" ||
       cleanPass === "admin123" ||
       cleanPass === "thiago" ||
-      cleanPass === "reicomboadm" ||
       settings.adminEmails.some(em => em.toLowerCase() === cleanPass.toLowerCase());
 
     if (isAuthorized) {
       setIsAuthenticated(true);
       setAuthError(false);
+      const emailToSave = cleanPass.toLowerCase().includes("@")
+        ? cleanPass.toLowerCase()
+        : "reicomboadm@gmail.com";
+      setAdminEmail(emailToSave);
       if (typeof window !== "undefined") {
-        localStorage.setItem("admin_authenticated_email", "reicomboadm@gmail.com");
+        localStorage.setItem("admin_authenticated_email", emailToSave);
       }
     } else {
       setAuthError(true);
@@ -274,7 +282,7 @@ export default function AdminDashboardPage() {
           </div>
           <h1 className="text-2xl font-black text-white">Painel Administrativo</h1>
           <p className="text-xs text-gray-400 mt-1">
-            Administrador Principal: <span className="text-purple-300 font-semibold">reicomboadm@gmail.com</span>
+            Administradores: <span className="text-purple-300 font-semibold">reicomboadm@gmail.com</span> • <span className="text-purple-300 font-semibold">gptdoscriasstpg@gmail.com</span>
           </p>
         </div>
 
@@ -292,13 +300,13 @@ export default function AdminDashboardPage() {
                   setAdminPassInput(e.target.value);
                   setAuthError(false);
                 }}
-                placeholder="reicomboadm@gmail.com ou senha"
+                placeholder="E-mail de administrador ou senha"
                 className="w-full px-4 py-3 rounded-xl bg-surface-100 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500 transition"
               />
               {authError && (
                 <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 mt-2">
                   <p className="text-xs text-rose-300 font-medium">
-                    Acesso restrito. Digite <strong className="text-white">reicomboadm@gmail.com</strong> ou a senha administrativa.
+                    Acesso restrito. Digite <strong className="text-white">reicomboadm@gmail.com</strong>, <strong className="text-white">gptdoscriasstpg@gmail.com</strong> ou a senha administrativa.
                   </p>
                 </div>
               )}
@@ -336,7 +344,7 @@ export default function AdminDashboardPage() {
               ADMINISTRADOR PRINCIPAL
             </span>
             <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0e1322] text-white border border-white/10">
-              reicomboadm@gmail.com
+              {adminEmail}
             </span>
             <span className="text-[11px] text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Acesso Liberado

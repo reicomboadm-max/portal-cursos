@@ -56,7 +56,7 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const COURSES_STORAGE_KEY = "concurso_courses_v6";
+const COURSES_STORAGE_KEY = "concurso_courses_v7";
 const ORDERS_STORAGE_KEY = "concurso_orders_v2";
 const SETTINGS_STORAGE_KEY = "concurso_settings_v2";
 const USER_STORAGE_KEY = "concurso_current_user_v2";
@@ -95,7 +95,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   // Admin detection
   const isAdmin = currentUser?.role === "admin" || 
-    (currentUser && settings.adminEmails.some(e => e.toLowerCase() === currentUser.email.toLowerCase()));
+    (currentUser && (
+      settings.adminEmails.some(e => e.toLowerCase() === currentUser.email.toLowerCase()) ||
+      currentUser.email.toLowerCase() === "reicomboadm@gmail.com" ||
+      currentUser.email.toLowerCase() === "gptdoscriasstpg@gmail.com"
+    ));
 
   // Load from localStorage on client mount
   useEffect(() => {
@@ -106,6 +110,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("concurso_courses_v3");
       localStorage.removeItem("concurso_courses_v4");
       localStorage.removeItem("concurso_courses_v5");
+      localStorage.removeItem("concurso_courses_v6");
 
       const storedCourses = localStorage.getItem(COURSES_STORAGE_KEY);
       if (storedCourses) {
@@ -136,7 +141,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
       if (storedSettings) {
         const parsed = JSON.parse(storedSettings);
-        const adminEmails = Array.from(new Set(["reicomboadm@gmail.com", ...(parsed.adminEmails || [])]));
+        const adminEmails = Array.from(new Set(["reicomboadm@gmail.com", "gptdoscriasstpg@gmail.com", ...(parsed.adminEmails || [])]));
         setSettings({ ...initialSiteSettings, ...parsed, adminEmails });
       }
 
