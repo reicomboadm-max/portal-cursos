@@ -29,7 +29,7 @@ export function FaqSection() {
     },
     {
       q: "Posso alterar o meu e-mail do Gmail após a compra?",
-      a: "Sim. Caso queira receber o convite em outro e-mail do Gmail, basta enviar uma mensagem para o nosso suporte no WhatsApp informando o código do seu pedido.",
+      a: "Sim. Caso queira receber o convite em outro e-mail do Gmail, basta enviar uma mensagem para o nosso suporte no Telegram (@Baldodrive) informando o código do seu pedido.",
     },
   ];
 

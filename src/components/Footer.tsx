@@ -2,14 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { MessageCircle, Send, ShieldCheck, MailCheck, HardDrive } from "lucide-react";
+import { Send, ShieldCheck, MailCheck, HardDrive } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 import { BrandLogo } from "@/components/BrandLogo";
 
 export default function Footer() {
   const { settings } = useStore();
-  const cleanWhatsappNumber = settings.whatsappSupport.replace(/\D/g, "");
-  const whatsappUrl = `https://wa.me/${cleanWhatsappNumber}?text=Ol%C3%A1!%20Gostaria%20de%20tirar%20d%C3%BAvidas%20sobre%20os%20drives%20de%20cursos.`;
+  const telegramSupportUrl = settings.telegramSupport || "https://t.me/Baldodrive";
+  const telegramChannelUrl = settings.telegramChannel || "https://t.me/comboreiboss";
 
   return (
     <footer className="border-t border-white/10 bg-neutral-950/80 backdrop-blur-md text-neutral-400 text-xs mt-auto">
@@ -53,26 +53,24 @@ export default function Footer() {
             </a>
 
             <a
-              href={whatsappUrl}
+              href={telegramSupportUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold transition border border-emerald-500/30"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-semibold transition border border-sky-500/30"
             >
-              <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Suporte WhatsApp</span>
+              <Send className="w-3.5 h-3.5 text-sky-400" />
+              <span>Suporte @Baldodrive</span>
             </a>
 
-            {settings.telegramSupport && (
-              <a
-                href={settings.telegramSupport.startsWith("http") ? settings.telegramSupport : `https://t.me/${settings.telegramSupport.replace("@", "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-semibold transition border border-sky-500/30"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Telegram</span>
-              </a>
-            )}
+            <a
+              href={telegramChannelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-semibold transition border border-blue-500/30"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Canal Telegram</span>
+            </a>
           </div>
 
         </div>
@@ -90,7 +88,7 @@ export default function Footer() {
             <span>•</span>
             <span className="text-neutral-400">Download 100% Liberado</span>
             <span>•</span>
-            <span className="text-neutral-400">PIX Instantâneo</span>
+            <span className="text-sky-400">Suporte no Telegram</span>
           </div>
         </div>
 

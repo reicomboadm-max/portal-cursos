@@ -32,7 +32,7 @@ export function Testimonials() {
     {
       name: "Camila Bittencourt",
       cargo: "Concurseira Receita Federal & SEFAZ-SP",
-      comment: "Comprei o Super Combo Passaporte Fiscal. Veio com Receita, todas as SEFAZs e ainda suporte pelo WhatsApp quando precisei tirar dúvida sobre um arquivo. Nota 10!",
+      comment: "Comprei o Super Combo Passaporte Fiscal. Veio com Receita, todas as SEFAZs e ainda suporte pelo Telegram quando precisei tirar dúvida sobre um arquivo. Nota 10!",
       rating: 5,
       date: "Há 5 dias",
       tag: "Combo Fiscal",

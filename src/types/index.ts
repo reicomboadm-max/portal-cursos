@@ -71,6 +71,7 @@ export interface SiteSettings {
   beneficiaryCity: string;
   whatsappSupport: string;
   telegramSupport: string;
+  telegramChannel?: string;
   bannerNotice: string;
   deliveryTimeNotice: string; // Ex: "Envio em até 24 horas após confirmação do PIX"
   allowSelfRegistration: boolean;

@@ -142,7 +142,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (storedSettings) {
         const parsed = JSON.parse(storedSettings);
         const adminEmails = Array.from(new Set(["reicomboadm@gmail.com", "gptdoscriasstpg@gmail.com", ...(parsed.adminEmails || [])]));
-        setSettings({ ...initialSiteSettings, ...parsed, adminEmails });
+        const telegramSupport = (!parsed.telegramSupport || parsed.telegramSupport.includes("driveconcursos_suporte"))
+          ? "https://t.me/Baldodrive"
+          : parsed.telegramSupport;
+        const telegramChannel = parsed.telegramChannel || "https://t.me/comboreiboss";
+        setSettings({ ...initialSiteSettings, ...parsed, adminEmails, telegramSupport, telegramChannel });
       }
 
       const storedUser = localStorage.getItem(USER_STORAGE_KEY);

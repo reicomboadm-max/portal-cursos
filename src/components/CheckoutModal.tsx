@@ -10,7 +10,7 @@ import {
   Lock, 
   Copy, 
   Check, 
-  MessageCircle, 
+  Send, 
   AlertCircle, 
   CheckCircle2, 
   Sparkles,
@@ -130,12 +130,8 @@ export function CheckoutModal() {
     loginAsStudent(order.studentEmail, order.studentName);
   };
 
-  const cleanWhatsappNumber = settings.whatsappSupport.replace(/\D/g, "");
-  const whatsappReceiptMessage = order
-    ? encodeURIComponent(
-        `Olá! Acabei de realizar o pagamento via PIX para o pedido *${order.id}* do curso *${order.courseTitle}* no valor de ${formatCurrency(order.amount)}. Meu Gmail para envio do Drive em até 24h é: *${order.studentEmail}*`
-      )
-    : "";
+  const telegramSupportUrl = settings.telegramSupport || "https://t.me/Baldodrive";
+  const telegramChannelUrl = settings.telegramChannel || "https://t.me/comboreiboss";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
@@ -240,13 +236,13 @@ export function CheckoutModal() {
 
             <div>
               <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                WhatsApp com DDD (para envio de notificações e suporte)
+                Telefone ou Telegram (opcional para notificações)
               </label>
               <input
-                type="tel"
+                type="text"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="(11) 99999-9999"
+                placeholder="(11) 99999-9999 ou @seu_usuario"
                 className="w-full px-4 py-3 rounded-xl bg-surface-100 border border-white/10 text-white placeholder-gray-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
               />
             </div>
@@ -317,13 +313,13 @@ export function CheckoutModal() {
                   </Link>
 
                   <a
-                    href={`https://wa.me/${cleanWhatsappNumber}?text=${whatsappReceiptMessage}`}
+                    href="https://t.me/Baldodrive"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition flex items-center justify-center gap-1.5"
+                    className="w-full py-2 px-3 rounded-lg text-xs font-semibold text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 transition flex items-center justify-center gap-1.5"
                   >
-                    <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Avisar no WhatsApp sobre o pagamento</span>
+                    <Send className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Avisar no Telegram (@Baldodrive)</span>
                   </a>
                 </div>
               </div>
@@ -406,29 +402,27 @@ export function CheckoutModal() {
                   <p>3. Seu e-mail <strong className="text-white">{order.studentEmail}</strong> receberá o convite para a pasta no Google Drive em <strong>até 24 horas</strong>.</p>
                 </div>
 
-                {/* Direct WhatsApp Support */}
+                {/* Direct Telegram Support */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   <a
-                    href={`https://wa.me/${cleanWhatsappNumber}?text=${whatsappReceiptMessage}`}
+                    href="https://t.me/Baldodrive"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 transition flex items-center justify-center gap-1.5"
                   >
-                    <MessageCircle className="w-4 h-4 text-emerald-400" />
-                    <span>Dúvidas no WhatsApp</span>
+                    <Send className="w-4 h-4 text-sky-400" />
+                    <span>Suporte @Baldodrive</span>
                   </a>
 
-                  {settings.telegramSupport && (
-                    <a
-                      href={settings.telegramSupport}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition flex items-center justify-center gap-1.5"
-                    >
-                      <Sparkles className="w-4 h-4 text-cyan-400" />
-                      <span>Canal no Telegram</span>
-                    </a>
-                  )}
+                  <a
+                    href="https://t.me/comboreiboss"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 transition flex items-center justify-center gap-1.5"
+                  >
+                    <Send className="w-4 h-4 text-blue-400" />
+                    <span>Canal no Telegram</span>
+                  </a>
                 </div>
 
                 {/* Demo / Test Simulation button */}

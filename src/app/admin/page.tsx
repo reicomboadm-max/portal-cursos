@@ -110,12 +110,11 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     const cleanPass = adminPassInput.trim();
     const isAuthorized =
+      cleanPass === "Central255*" ||
       cleanPass.toLowerCase() === "reicomboadm@gmail.com" ||
       cleanPass.toLowerCase() === "gptdoscriasstpg@gmail.com" ||
       cleanPass.toLowerCase() === "reicomboadm" ||
       cleanPass.toLowerCase() === "gptdoscriasstpg" ||
-      cleanPass === "admin123" ||
-      cleanPass === "thiago" ||
       settings.adminEmails.some(em => em.toLowerCase() === cleanPass.toLowerCase());
 
     if (isAuthorized) {
@@ -1287,24 +1286,24 @@ export default function AdminDashboardPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">WhatsApp de Suporte (com DDD)</label>
-              <input
-                type="text"
-                value={localSettings.whatsappSupport}
-                onChange={(e) => setLocalSettings({ ...localSettings, whatsappSupport: e.target.value })}
-                placeholder="5511999999999"
-                className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">Link do Telegram</label>
+              <label className="block text-xs font-semibold text-gray-300 mb-1">Telegram de Suporte (@Baldodrive)</label>
               <input
                 type="text"
                 value={localSettings.telegramSupport}
                 onChange={(e) => setLocalSettings({ ...localSettings, telegramSupport: e.target.value })}
-                placeholder="https://t.me/seucanal"
-                className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs"
+                placeholder="https://t.me/Baldodrive"
+                className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-300 mb-1">Canal Oficial Telegram</label>
+              <input
+                type="text"
+                value={localSettings.telegramChannel || "https://t.me/comboreiboss"}
+                onChange={(e) => setLocalSettings({ ...localSettings, telegramChannel: e.target.value })}
+                placeholder="https://t.me/comboreiboss"
+                className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono"
               />
             </div>
           </div>

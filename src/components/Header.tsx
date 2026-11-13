@@ -11,7 +11,7 @@ import {
   X, 
   User, 
   ShieldCheck, 
-  MessageCircle, 
+  Send, 
   GraduationCap
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -21,9 +21,8 @@ export function Header() {
   const router = useRouter();
   const { settings, currentUser, setActiveSegmentFilter } = useStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const cleanWhatsappNumber = settings.whatsappSupport.replace(/\D/g, "");
-  const whatsappUrl = `https://wa.me/${cleanWhatsappNumber}?text=Ol%C3%A1!%20Gostaria%20de%20tirar%20d%C3%BAvidas%20sobre%20os%20drives%20de%20cursos.`;
+  const telegramSupportUrl = settings.telegramSupport || "https://t.me/Baldodrive";
+  const telegramChannelUrl = settings.telegramChannel || "https://t.me/comboreiboss";
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-neutral-950/80 backdrop-blur-xl animate-fade-slide">
@@ -68,13 +67,26 @@ export function Header() {
           </Link>
 
           <a
-            href={whatsappUrl}
+            href={telegramChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border-gradient bg-white/5 backdrop-blur-xl px-4 py-2 text-xs sm:text-sm font-medium text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-full border-gradient bg-white/5 backdrop-blur-xl px-3.5 py-2 text-xs sm:text-sm font-medium text-sky-400 hover:text-sky-300 hover:bg-sky-500/10 transition"
+            title="Canal Telegram"
           >
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">WhatsApp</span>
+            <Send className="w-3.5 h-3.5 text-sky-400" />
+            <span>Canal Telegram</span>
+          </a>
+
+          <a
+            href={telegramSupportUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border-gradient bg-sky-500/15 border border-sky-500/30 backdrop-blur-xl px-4 py-2 text-xs sm:text-sm font-semibold text-sky-300 hover:text-white hover:bg-sky-500/25 transition shadow-lg shadow-sky-500/15"
+            title="Suporte no Telegram @Baldodrive"
+          >
+            <Send className="w-3.5 h-3.5 text-sky-400" />
+            <span className="hidden sm:inline">Suporte @Baldodrive</span>
+            <span className="sm:hidden">Telegram</span>
           </a>
 
           <Link
