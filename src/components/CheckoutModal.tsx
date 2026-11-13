@@ -172,7 +172,7 @@ export function CheckoutModal() {
             <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Curso Selecionado</span>
             <p className="text-sm font-bold text-white truncate">{selectedCourseForCheckout.title}</p>
             <p className="text-xs text-neutral-400">
-              {selectedCourseForCheckout.folderSize} • {selectedCourseForCheckout.platform}
+              {selectedCourseForCheckout.platform}
             </p>
           </div>
           <div className="text-right shrink-0">

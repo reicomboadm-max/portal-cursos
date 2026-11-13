@@ -235,7 +235,7 @@ export default function AlunoPage() {
                       </span>
 
                       <span className="text-[10px] text-gray-400 font-semibold bg-white/5 px-2 py-0.5 rounded">
-                        {course.folderSize}
+                        {course.totalFiles || "Material Completo"}
                       </span>
                     </div>
 

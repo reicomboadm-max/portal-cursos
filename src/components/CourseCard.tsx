@@ -74,10 +74,6 @@ export default function CourseCard({ course }: CourseCardProps) {
               <span className="text-xs text-slate-500 line-through">R$ {course.originalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-            <Folder className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{course.folderSize}</span>
-          </div>
           <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
             <FileText className="w-3.5 h-3.5 text-indigo-400" />
             <span>{course.totalFiles}</span>

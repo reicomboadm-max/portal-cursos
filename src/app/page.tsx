@@ -8,6 +8,7 @@ import { FluxoraBackground } from "@/components/FluxoraBackground";
 import StarBorder from "@/components/reactbits/StarBorder";
 import GooeyNav from "@/components/reactbits/GooeyNav";
 import Footer from "@/components/Footer";
+import { FAQ } from "@/components/FAQ";
 import { 
   Search, 
   X, 
@@ -287,6 +288,9 @@ export default function HomePage() {
           )}
 
         </div>
+
+        {/* Perguntas Frequentes (FAQ) */}
+        <FAQ />
 
       </main>
 

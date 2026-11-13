@@ -151,10 +151,10 @@ export function Hero() {
         <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto">
           <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
             <div className="flex items-center justify-center gap-2 text-emerald-400 mb-1">
-              <HardDrive className="w-4 h-4" />
-              <span className="text-xl sm:text-2xl font-black text-white">+2.500 GB</span>
+              <CheckCircle2 className="w-4 h-4" />
+              <span className="text-xl sm:text-2xl font-black text-white">100% Completo</span>
             </div>
-            <p className="text-xs text-slate-400 font-medium">Conteúdo em Alta Resolução</p>
+            <p className="text-xs text-slate-400 font-medium">Videoaulas, PDFs e Editais</p>
           </div>
 
           <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800">

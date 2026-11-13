@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
+import { BrandLogo } from "@/components/BrandLogo";
 import { formatCurrency, formatDate, parsePrice, formatPriceNumber } from "@/lib/utils";
 import { Course, OrderStatus, SegmentType } from "@/types";
 import { 
@@ -298,24 +299,24 @@ export default function AdminDashboardPage() {
     return (
       <div className="py-20 px-4 max-w-md mx-auto">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto mb-3 border border-purple-500/20">
-            <Lock className="w-7 h-7" />
+          <div className="flex justify-center mb-4">
+            <BrandLogo size={56} />
           </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold mb-2">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Área Exclusiva para Administrador</span>
+            <span>Painel Administrativo</span>
           </div>
-          <h1 className="text-2xl font-black text-white">Painel Administrativo</h1>
-          <p className="text-xs text-gray-400 mt-1">
-            Administradores: <span className="text-purple-300 font-semibold">reicomboadm@gmail.com</span> • <span className="text-purple-300 font-semibold">gptdoscriasstpg@gmail.com</span>
+          <h1 className="text-2xl font-black text-white">Central do Aprovado</h1>
+          <p className="text-xs text-neutral-400 mt-1">
+            Gestão de Pedidos, Liberação de Drives & Catálogo
           </p>
         </div>
 
-        <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-white/10 shadow-2xl bg-[#0b0f19]/80 backdrop-blur-xl">
+        <div className="p-6 sm:p-7 rounded-3xl border border-white/10 shadow-2xl bg-[#0b0e17]/90 backdrop-blur-xl">
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                Identificação do Administrador ou Senha
+              <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                E-mail de Administrador ou Senha
               </label>
               <input
                 type="password"
@@ -326,7 +327,7 @@ export default function AdminDashboardPage() {
                   setAuthError(false);
                 }}
                 placeholder="E-mail de administrador ou senha"
-                className="w-full px-4 py-3 rounded-xl bg-surface-100 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500 transition"
+                className="w-full px-4 py-3 rounded-xl bg-[#121724] border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
               />
               {authError && (
                 <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 mt-2">
@@ -339,7 +340,7 @@ export default function AdminDashboardPage() {
 
             <button
               type="submit"
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-600/30 transition cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 transition cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98]"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Acessar Painel de Admin</span>
@@ -347,7 +348,7 @@ export default function AdminDashboardPage() {
           </form>
 
           <div className="mt-5 pt-4 border-t border-white/5 text-center">
-            <Link href="/" className="text-xs text-gray-400 hover:text-white transition">
+            <Link href="/" className="text-xs text-neutral-400 hover:text-white transition">
               ← Voltar para o Site Principal
             </Link>
           </div>
@@ -364,18 +365,18 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1.5">
+            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 border border-red-500/30 flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
               ADMINISTRADOR PRINCIPAL
             </span>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#0e1322] text-white border border-white/10">
+            <span className="text-xs font-mono px-2.5 py-1 rounded-lg bg-[#0e1322] text-white border border-white/10">
               {adminEmail}
             </span>
             <span className="text-[11px] text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Acesso Liberado
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white mt-2">
+          <h1 className="text-2xl sm:text-3xl font-black text-white mt-2 tracking-tight">
             Gestão de Vendas & Liberação de Drives
           </h1>
         </div>
@@ -383,7 +384,7 @@ export default function AdminDashboardPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Ver Loja</span>
@@ -398,14 +399,14 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* KPI Stats Cards */}
+      {/* KPI Stats Cards (Minimal Tech) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="p-5 rounded-2xl bg-surface-100/70 border border-white/5">
+        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
           <div className="flex items-center justify-between text-emerald-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Faturamento Total</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Faturamento Total</span>
             <DollarSign className="w-4 h-4" />
           </div>
-          <span className="text-2xl sm:text-3xl font-black text-white">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
             {formatCurrency(totalRevenue)}
           </span>
           <p className="text-[11px] text-emerald-400 font-medium mt-1">
@@ -413,25 +414,25 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-surface-100/70 border border-white/5">
-          <div className="flex items-center justify-between text-indigo-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Vendas Pagas</span>
+        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
+          <div className="flex items-center justify-between text-red-400 mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Vendas Pagas</span>
             <ShoppingBag className="w-4 h-4" />
           </div>
-          <span className="text-2xl sm:text-3xl font-black text-white">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
             {paidOrders.length}
           </span>
-          <p className="text-[11px] text-indigo-400 font-medium mt-1">
+          <p className="text-[11px] text-neutral-400 font-medium mt-1">
             Drives liberados
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-surface-100/70 border border-white/5">
+        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
           <div className="flex items-center justify-between text-amber-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">PIX Pendentes</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">PIX Pendentes</span>
             <Clock className="w-4 h-4" />
           </div>
-          <span className="text-2xl sm:text-3xl font-black text-white">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
             {pendingOrders.length}
           </span>
           <p className="text-[11px] text-amber-400 font-medium mt-1">
@@ -439,67 +440,67 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-surface-100/70 border border-white/5">
-          <div className="flex items-center justify-between text-cyan-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Ticket Médio</span>
+        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
+          <div className="flex items-center justify-between text-neutral-300 mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Ticket Médio</span>
             <TrendingUp className="w-4 h-4" />
           </div>
-          <span className="text-2xl sm:text-3xl font-black text-white">
+          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
             {formatCurrency(averageTicket)}
           </span>
-          <p className="text-[11px] text-cyan-400 font-medium mt-1">
+          <p className="text-[11px] text-neutral-400 font-medium mt-1">
             Por aluno aprovado
           </p>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex border-b border-white/10 gap-3 mb-6">
+      {/* Navigation Tabs (Minimal Tech) */}
+      <div className="flex border-b border-white/10 gap-3 mb-6 overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveTab("sales")}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition cursor-pointer ${
             activeTab === "sales"
-              ? "border-purple-500 text-white"
-              : "border-transparent text-gray-400 hover:text-gray-200"
+              ? "border-red-500 text-white shadow-[0_1px_10px_rgba(239,68,68,0.4)]"
+              : "border-transparent text-neutral-400 hover:text-white"
           }`}
         >
-          <ShoppingBag className="w-4 h-4 text-purple-400" />
+          <ShoppingBag className={`w-4 h-4 ${activeTab === "sales" ? "text-red-400" : "text-neutral-400"}`} />
           <span>Vendas & Pedidos ({orders.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab("courses")}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition cursor-pointer ${
             activeTab === "courses"
-              ? "border-purple-500 text-white"
-              : "border-transparent text-gray-400 hover:text-gray-200"
+              ? "border-red-500 text-white shadow-[0_1px_10px_rgba(239,68,68,0.4)]"
+              : "border-transparent text-neutral-400 hover:text-white"
           }`}
         >
-          <HardDrive className="w-4 h-4 text-indigo-400" />
+          <HardDrive className={`w-4 h-4 ${activeTab === "courses" ? "text-red-400" : "text-neutral-400"}`} />
           <span>Gerenciar Cursos & Drives ({courses.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab("settings")}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition cursor-pointer ${
             activeTab === "settings"
-              ? "border-purple-500 text-white"
-              : "border-transparent text-gray-400 hover:text-gray-200"
+              ? "border-red-500 text-white shadow-[0_1px_10px_rgba(239,68,68,0.4)]"
+              : "border-transparent text-neutral-400 hover:text-white"
           }`}
         >
-          <Settings className="w-4 h-4 text-emerald-400" />
+          <Settings className={`w-4 h-4 ${activeTab === "settings" ? "text-red-400" : "text-neutral-400"}`} />
           <span>Configurações & Chave PIX</span>
         </button>
 
         <button
           onClick={() => setActiveTab("clientes")}
-          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition ${
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition cursor-pointer ${
             activeTab === "clientes"
-              ? "border-purple-500 text-white"
-              : "border-transparent text-gray-400 hover:text-gray-200"
+              ? "border-red-500 text-white shadow-[0_1px_10px_rgba(239,68,68,0.4)]"
+              : "border-transparent text-neutral-400 hover:text-white"
           }`}
         >
-          <Users className="w-4 h-4 text-cyan-400" />
+          <Users className={`w-4 h-4 ${activeTab === "clientes" ? "text-red-400" : "text-neutral-400"}`} />
           <span>Clientes & Alunos</span>
         </button>
       </div>
@@ -524,8 +525,8 @@ export default function AdminDashboardPage() {
             <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
               <button
                 onClick={() => setOrderFilter("ALL")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
-                  orderFilter === "ALL" ? "bg-purple-600 text-white" : "bg-white/5 text-gray-300 hover:bg-white/10"
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
+                  orderFilter === "ALL" ? "bg-red-600 text-white shadow-md shadow-red-600/30" : "bg-white/5 text-gray-300 hover:bg-white/10"
                 }`}
               >
                 Todos ({orders.length})
@@ -842,7 +843,7 @@ export default function AdminDashboardPage() {
                         <h4 className="font-bold text-white text-base mt-1.5 truncate" title={c.title}>
                           {c.title}
                         </h4>
-                        <p className="text-xs text-gray-400">{c.folderSize} • {c.platform}</p>
+                        <p className="text-xs text-gray-400">{c.platform}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-base font-black text-emerald-400 block">
@@ -1109,29 +1110,17 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Tamanho da Pasta (ex: 140 GB)
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm?.folderSize || ""}
-                    onChange={(e) => handleEditChange("folderSize", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Total de Arquivos (ex: +1.400 Aulas & PDFs)
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm?.totalFiles || ""}
-                    onChange={(e) => handleEditChange("totalFiles", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Total de Arquivos & Aulas (ex: +1.400 Aulas & PDFs)
+                </label>
+                <input
+                  type="text"
+                  value={editForm?.totalFiles || ""}
+                  onChange={(e) => handleEditChange("totalFiles", e.target.value)}
+                  placeholder="Ex: +1.400 Aulas & PDFs"
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-red-500"
+                />
               </div>
 
               <div>
@@ -1219,15 +1208,15 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Administrador Principal */}
-          <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 space-y-3">
+          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-purple-400" />
+                <ShieldCheck className="w-4 h-4 text-red-400" />
                 <span className="text-xs font-bold text-white uppercase tracking-wider">
                   Administrador Principal do Site
                 </span>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
                 Acesso Total / Super Admin
               </span>
             </div>
@@ -1447,7 +1436,7 @@ export default function AdminDashboardPage() {
 
           <button
             type="submit"
-            className="w-full py-3.5 px-4 rounded-xl font-bold text-xs bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/30 transition flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 transition flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
           >
             <Save className="w-4 h-4" />
             <span>Salvar Todas as Configurações</span>
