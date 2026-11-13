@@ -132,8 +132,8 @@ export function BrazilMap({ salesByState, activeMetric, onSelectState }: BrazilM
                 className="transition-all duration-200"
               />
 
-              {/* State abbreviation for top states */}
-              {(hasSales || isHovered || uf === "DF" || uf === "SP" || uf === "RJ") && (
+              {/* State abbreviation for active or hovered states */}
+              {(hasSales || isHovered) && (
                 <text
                   x={pt.x + 8}
                   y={pt.y + 3.5}

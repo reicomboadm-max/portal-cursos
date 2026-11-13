@@ -14,8 +14,9 @@ export async function POST(req: NextRequest) {
     const isTablet = /tablet|ipad/i.test(userAgent);
     const device = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
 
-    const state = (body.state || vercelRegion || "DF").toUpperCase().trim();
-    const city = body.city || decodeURIComponent(vercelCity) || "Brasília";
+    const state = (body.state || vercelRegion || "").toUpperCase().trim() || undefined;
+    const rawCity = body.city || (vercelCity ? decodeURIComponent(vercelCity) : "");
+    const city = rawCity.trim() || undefined;
 
     recordVisit({
       path: body.path || "/",

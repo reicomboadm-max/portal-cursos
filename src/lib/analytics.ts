@@ -26,67 +26,21 @@ function initStore(): AnalyticsStore {
     initialHourly[h] = 0;
   }
 
-  // Pre-fill baseline hours based on realistic activity (ex: 40 visits today)
-  initialHourly["09"] = 3;
-  initialHourly["10"] = 5;
-  initialHourly["11"] = 4;
-  initialHourly["12"] = 8;
-  initialHourly["14"] = 6;
-  initialHourly["16"] = 5;
-  initialHourly["18"] = 7;
-  initialHourly["19"] = 2;
-
   return {
     todayDate: today,
-    todayVisits: 40,
-    yesterdayVisits: 33,
-    totalVisits: 40,
-    sessionsToday: new Set<string>(["session-baseline-1", "session-baseline-2"]),
+    todayVisits: 0,
+    yesterdayVisits: 0,
+    totalVisits: 0,
+    sessionsToday: new Set<string>(),
     visitsByHour: initialHourly,
-    visitsByState: {
-      DF: 28,
-      SP: 6,
-      RJ: 3,
-      MG: 2,
-      RS: 1,
-    },
-    visitsByUtm: {
-      "Direto / Orgânico": 26,
-      "Telegram (@Baldodrive)": 9,
-      "Google Search": 3,
-      "Instagram": 2,
-    },
+    visitsByState: {},
+    visitsByUtm: {},
     visitsByDevice: {
-      mobile: 31,
-      desktop: 8,
-      tablet: 1,
+      mobile: 0,
+      desktop: 0,
+      tablet: 0,
     },
-    recentEvents: [
-      {
-        path: "/",
-        state: "DF",
-        city: "Brasília",
-        device: "mobile",
-        utmSource: "Direto",
-        timestamp: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
-      },
-      {
-        path: "/cursos",
-        state: "DF",
-        city: "Brasília",
-        device: "mobile",
-        utmSource: "Telegram",
-        timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
-      },
-      {
-        path: "/checkout?course=course-014-7fontes-sefaz-al",
-        state: "SP",
-        city: "São Paulo",
-        device: "desktop",
-        utmSource: "Google",
-        timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-      },
-    ],
+    recentEvents: [],
   };
 }
 
@@ -132,9 +86,11 @@ export function recordVisit(event: {
   // Hourly
   store.visitsByHour[hour] = (store.visitsByHour[hour] || 0) + 1;
 
-  // State
-  const stateCode = (event.state || "DF").toUpperCase().trim();
-  store.visitsByState[stateCode] = (store.visitsByState[stateCode] || 0) + 1;
+  // State (only if genuinely detected)
+  const stateCode = event.state ? event.state.toUpperCase().trim() : undefined;
+  if (stateCode) {
+    store.visitsByState[stateCode] = (store.visitsByState[stateCode] || 0) + 1;
+  }
 
   // UTM
   const utm = event.utmSource?.trim() || "Direto / Orgânico";
@@ -148,7 +104,7 @@ export function recordVisit(event: {
   const item: VisitorEvent = {
     path: event.path || "/",
     state: stateCode,
-    city: event.city || "Brasília",
+    city: event.city?.trim() || undefined,
     device: dev,
     utmSource: utm,
     referrer: event.referrer,

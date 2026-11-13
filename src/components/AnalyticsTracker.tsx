@@ -13,6 +13,8 @@ export function AnalyticsTracker() {
   // Internal real-time visitor telemetry
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Don't track admin page views as customer traffic
+    if (window.location.pathname.startsWith("/admin")) return;
 
     try {
       let sessionId = sessionStorage.getItem("_cda_sid");
