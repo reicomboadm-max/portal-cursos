@@ -4,17 +4,15 @@ import React, { useMemo } from "react";
 import { Header } from "@/components/Header";
 import { useStore } from "@/context/StoreContext";
 import { CheckoutModal } from "@/components/CheckoutModal";
+import { FluxoraBackground } from "@/components/FluxoraBackground";
 import Footer from "@/components/Footer";
 import { 
   Search, 
   X, 
-  HardDrive, 
-  CheckCircle2, 
-  ShieldCheck, 
-  Clock, 
-  Download,
-  FolderOpen,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  CheckCircle2,
+  HardDrive
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { SegmentType } from "@/types";
@@ -85,25 +83,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050507] text-white flex flex-col font-sans selection:bg-red-600 selection:text-white">
+    <div className="relative min-h-screen bg-neutral-950 text-white flex flex-col font-sans selection:bg-red-600 selection:text-white antialiased">
       
-      {/* Background Subtle SVG Grid from Fluxora */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute inset-0 opacity-[0.03]">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
-                <path d="M48 0H0v48" fill="none" stroke="white" strokeWidth="0.5"></path>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)"></rect>
-          </svg>
-        </div>
-      </div>
-
-      {/* Cosmic Nebula Spiral & Galaxy Glow from Xinyu */}
-      <div className="cosmic-galaxy-bg" />
-      <div className="cosmic-nebula-spiral" />
+      {/* Background Completo do Fluxora (Unicorn Studio WebGL Scene + Grid Pattern) */}
+      <FluxoraBackground />
 
       {/* Top Navbar */}
       <Header />
@@ -111,23 +94,23 @@ export default function HomePage() {
       {/* Main Showcase Section */}
       <main className="relative z-10 flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
         
-        {/* Sleek Pill Announcement */}
-        <div className="w-fit mx-auto mb-6 animate-fade-slide">
+        {/* Sleek Pill Announcement (Fluxora Style) */}
+        <div className="w-fit mx-auto mb-6 [animation:fadeSlideIn_0.8s_ease-out_0.1s_both]">
           <div className="inline-flex items-center gap-2 rounded-full border-gradient bg-white/5 px-3.5 py-1.5 text-xs text-neutral-300 backdrop-blur-md">
-            <span className="inline-flex items-center justify-center rounded-full bg-red-600/20 text-red-400 px-2 py-0.5 text-[11px] font-semibold">
+            <span className="inline-flex items-center justify-center rounded-full bg-blue-400/20 text-blue-300 px-2 py-0.5 text-[11px] font-semibold">
               Drive 2026
             </span>
-            <span className="font-medium">Pastas Oficiais no Google Drive • Envio Imediato no seu Gmail</span>
+            <span className="font-medium">Pastas Oficiais no Google Drive • Acesso Vitalício no seu Gmail</span>
           </div>
         </div>
 
         {/* Clean Hero Search Header */}
-        <div className="text-center max-w-2xl mx-auto mb-8 animate-fade-slide">
+        <div className="text-center max-w-2xl mx-auto mb-8 [animation:fadeSlideIn_0.8s_ease-out_0.2s_both]">
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
             Central de Estudos
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-neutral-400">
-            Encontre seu curso, selecione e finalize via PIX para liberação de acesso na sua conta Google.
+            Encontre o seu curso, realize o pagamento via PIX e receba o convite de acesso compartilhado diretamente no seu Gmail.
           </p>
 
           {/* Clean Modern Search Bar */}
@@ -180,7 +163,7 @@ export default function HomePage() {
         </div>
 
         {/* Courses Section (Xinyu List Layout) */}
-        <div className="mt-8 animate-fade-slide">
+        <div className="mt-8 [animation:fadeSlideIn_0.8s_ease-out_0.3s_both]">
           
           {/* Section Bar */}
           <div className="flex items-center justify-between mb-3 px-2">
