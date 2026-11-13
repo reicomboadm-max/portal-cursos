@@ -78,4 +78,6 @@ export interface SiteSettings {
   veloraApiKey?: string;
   veloraApiSecret?: string;
   veloraWebhookSecret?: string;
+  googleAnalyticsId?: string; // Ex: G-XXXXXXXXXX
+  facebookPixelId?: string; // Ex: 123456789012345
 }

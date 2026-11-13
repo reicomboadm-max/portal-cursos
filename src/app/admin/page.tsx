@@ -1196,12 +1196,12 @@ export default function AdminDashboardPage() {
               <span className="text-[11px] font-bold text-gray-300 block">URL do Webhook para retorno automático:</span>
               <div className="flex items-center justify-between gap-2">
                 <code className="text-[11px] text-indigo-300 font-mono break-all select-all">
-                  https://portal-cursos.vercel.app/api/webhooks/velorapay
+                  https://www.centraldoaprovado.com.br/api/webhooks/velorapay
                 </code>
                 <button
                   type="button"
                   onClick={() => {
-                    navigator.clipboard.writeText("https://portal-cursos.vercel.app/api/webhooks/velorapay");
+                    navigator.clipboard.writeText("https://www.centraldoaprovado.com.br/api/webhooks/velorapay");
                     alert("URL do Webhook copiada!");
                   }}
                   className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold shrink-0 transition"
@@ -1212,6 +1212,50 @@ export default function AdminDashboardPage() {
               <p className="text-[10px] text-gray-400">
                 Cole essa URL no campo de Webhooks dentro do seu painel da VeloraPay para aprovação automática.
               </p>
+            </div>
+          </div>
+
+          {/* Rastreamento, Visibilidade & Tráfego (Google Analytics e Meta Pixel) */}
+          <div className="p-5 rounded-2xl bg-neutral-900/60 border border-white/10 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold text-white">Rastreamento, SEO & Alcance de Tráfego</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                Google & Meta
+              </span>
+            </div>
+
+            <p className="text-xs text-gray-300">
+              Conecte suas tags de mensuração para rastrear visitas, visualizações de cursos e conversões de compras automaticamente.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  ID do Google Analytics 4 (GA4)
+                </label>
+                <input
+                  type="text"
+                  value={localSettings.googleAnalyticsId || ""}
+                  onChange={(e) => setLocalSettings({ ...localSettings, googleAnalyticsId: e.target.value })}
+                  placeholder="Ex: G-XXXXXXXXXX"
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono"
+                />
+                <span className="text-[10px] text-gray-400 mt-1 block">Insira o código de medição do Google Analytics</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1">
+                  ID do Meta (Facebook) Pixel
+                </label>
+                <input
+                  type="text"
+                  value={localSettings.facebookPixelId || ""}
+                  onChange={(e) => setLocalSettings({ ...localSettings, facebookPixelId: e.target.value })}
+                  placeholder="Ex: 123456789012345"
+                  className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs font-mono"
+                />
+                <span className="text-[10px] text-gray-400 mt-1 block">Insira o ID do seu Pixel para anúncios no Instagram/Facebook</span>
+              </div>
             </div>
           </div>
 
