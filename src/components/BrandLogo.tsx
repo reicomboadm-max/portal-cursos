@@ -22,7 +22,7 @@ export function BrandLogo({
         style={{ width: size, height: size }}
       >
         <Image 
-          src="/logo-emblem-square.png" 
+          src="/logo-oficial-square.png" 
           alt="Central do Aprovado" 
           width={size * 2} 
           height={size * 2} 
