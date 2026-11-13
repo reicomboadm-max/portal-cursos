@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, parsePrice, formatPriceNumber } from "@/lib/utils";
 import { Course, OrderStatus, SegmentType } from "@/types";
 import { 
   ShieldCheck, 
@@ -60,6 +60,14 @@ export default function AdminDashboardPage() {
   // Course editing state
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isCreatingCourse, setIsCreatingCourse] = useState(false);
+  const [courseSearch, setCourseSearch] = useState("");
+  const [courseSegmentFilter, setCourseSegmentFilter] = useState<SegmentType | "todos">("todos");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   // Course edit form state
   const [editForm, setEditForm] = useState<{
@@ -167,8 +175,8 @@ export default function AdminDashboardPage() {
       description: course.description,
       shortDescription: course.shortDescription || "",
       badge: course.badge || "",
-      originalPrice: String(course.originalPrice),
-      price: String(course.price),
+      originalPrice: course.originalPrice > 0 ? formatPriceNumber(course.originalPrice) : "",
+      price: course.price > 0 ? formatPriceNumber(course.price) : "",
       driveUrl: course.driveUrl,
       features: course.features.join("\n"),
       folderSize: course.folderSize,
@@ -181,7 +189,21 @@ export default function AdminDashboardPage() {
   };
 
   const handleEditChange = (key: string, value: any) => {
-    setEditForm((prev) => (prev ? { ...prev, [key]: value } : ({ [key]: value } as any)));
+    setEditForm((prev) => {
+      if (!prev) return { [key]: value } as any;
+      const updated = { ...prev, [key]: value };
+      // Se estiver criando e digitando o título, sugerir slug automaticamente
+      if (key === "title" && isCreatingCourse) {
+        const autoSlug = String(value)
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+        updated.slug = autoSlug;
+      }
+      return updated;
+    });
   };
 
   const handleEditFeaturesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -201,21 +223,36 @@ export default function AdminDashboardPage() {
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
+    const parsedPrice = parsePrice(editForm.price);
+    const parsedOriginalPrice = parsePrice(editForm.originalPrice);
+
+    const cleanTitle = editForm.title.trim() || "Novo Curso";
+    const generatedSlug = editForm.slug.trim() || cleanTitle
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
     const courseData = {
-      title: editForm.title,
-      slug: editForm.slug,
+      title: cleanTitle,
+      slug: generatedSlug,
       segment: editForm.segment as SegmentType,
-      platform: editForm.platform,
-      description: editForm.description,
-      shortDescription: editForm.shortDescription || undefined,
-      badge: editForm.badge || undefined,
-      originalPrice: parseFloat(editForm.originalPrice) || 0,
-      price: parseFloat(editForm.price) || 0,
-      driveUrl: editForm.driveUrl,
-      features: featuresArray,
-      folderSize: editForm.folderSize,
-      totalFiles: editForm.totalFiles,
-      coverGradient: editForm.coverGradient,
+      platform: editForm.platform.trim() || "Material Completo 2026",
+      description: editForm.description.trim() || `Material completo e organizado para ${cleanTitle}. Videoaulas Full HD, PDFs e resumos com download 100% liberado.`,
+      shortDescription: editForm.shortDescription?.trim() || undefined,
+      badge: editForm.badge?.trim() || undefined,
+      originalPrice: parsedOriginalPrice,
+      price: parsedPrice,
+      driveUrl: editForm.driveUrl.trim() || "https://drive.google.com",
+      features: featuresArray.length > 0 ? featuresArray : [
+        "Acesso vitalício compartilhado no seu Gmail em até 24h",
+        "Videoaulas em alta resolução com download 100% liberado",
+        "PDFs completos, grifados, mapas mentais e resumos esquematizados"
+      ],
+      folderSize: editForm.folderSize.trim() || "120 GB",
+      totalFiles: editForm.totalFiles.trim() || "+1.200 Aulas & PDFs",
+      coverGradient: editForm.coverGradient || "from-red-600 to-amber-600",
       active: Boolean(editForm.active),
       updatedAt: new Date().toISOString(),
     } as Partial<Course> & { segment: SegmentType };
@@ -227,27 +264,15 @@ export default function AdminDashboardPage() {
         id: editingCourse.id,
       };
       updateCourse(updated);
+      showToast(`Curso "${updated.title}" atualizado com sucesso por ${formatCurrency(updated.price)}!`);
     } else {
       const newCourse: Course = {
         ...courseData,
         id: `course-${Date.now()}`,
-        slug: editForm.slug || `curso-${Date.now()}`,
-        title: editForm.title || "Novo Curso",
-        segment: editForm.segment as SegmentType,
-        platform: editForm.platform || "",
-        description: editForm.description || "",
-        originalPrice: parseFloat(editForm.originalPrice) || 0,
-        price: parseFloat(editForm.price) || 0,
-        driveUrl: editForm.driveUrl || "",
-        features: featuresArray,
-        folderSize: editForm.folderSize || "0 GB",
-        totalFiles: editForm.totalFiles || "0 Arquivos",
-        updatedAt: new Date().toISOString(),
-        active: Boolean(editForm.active),
-        coverGradient: editForm.coverGradient || "from-indigo-600 to-purple-600",
         stockStatus: "in_stock",
-      };
+      } as Course;
       addCourse(newCourse);
+      showToast(`Novo curso "${newCourse.title}" adicionado por ${formatCurrency(newCourse.price)}!`);
     }
 
     setEditForm(null);
@@ -690,21 +715,21 @@ export default function AdminDashboardPage() {
                     title: "",
                     slug: "",
                     segment: "fiscal",
-                    platform: "",
+                    platform: "Material Completo 2026",
                     description: "",
                     shortDescription: "",
-                    badge: "",
-                    originalPrice: "",
-                    price: "",
-                    driveUrl: "",
-                    features: "",
-                    folderSize: "",
-                    totalFiles: "",
-                    coverGradient: "from-indigo-600 to-purple-600",
+                    badge: "Drive 2026",
+                    originalPrice: "120,00",
+                    price: "59,90",
+                    driveUrl: "https://drive.google.com/drive/folders/...",
+                    features: "Acesso vitalício compartilhado no seu Gmail em até 24h\nVideoaulas em alta resolução com download 100% liberado\nPDFs completos, grifados, mapas mentais e resumos esquematizados",
+                    folderSize: "120 GB",
+                    totalFiles: "+1.200 Aulas & PDFs",
+                    coverGradient: "from-red-600 to-amber-600",
                     active: true,
                   });
                 }}
-                className="py-2 px-3.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition cursor-pointer"
+                className="py-2.5 px-4 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-500 text-white flex items-center gap-2 transition cursor-pointer shadow-lg shadow-red-600/20 active:scale-95"
               >
                 <Plus className="w-4 h-4" />
                 <span>Adicionar Novo Curso</span>
@@ -712,74 +737,196 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {courses.map((c) => (
-              <div key={c.id} className="p-5 rounded-2xl bg-surface-100/50 border border-white/5 space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 uppercase">
-                      {c.segment}
-                    </span>
-                    <h4 className="font-bold text-white text-base mt-1.5">{c.title}</h4>
-                    <p className="text-xs text-gray-400">{c.folderSize} • {c.platform}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-base font-black text-emerald-400 block">{formatCurrency(c.price)}</span>
-                    <span className="text-[11px] text-gray-500 line-through">{formatCurrency(c.originalPrice)}</span>
-                  </div>
-                </div>
+          {/* Search & Area Filter Bar (UI/UX Pro Max) */}
+          <div className="p-4 rounded-2xl bg-surface-100/60 border border-white/10 space-y-3">
+            <div className="relative">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={courseSearch}
+                onChange={(e) => setCourseSearch(e.target.value)}
+                placeholder="Buscar curso por nome, professor ou área (ex: INSS, PF, Adriana, SEFAZ)..."
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-red-500 placeholder-gray-500"
+              />
+              {courseSearch && (
+                <button
+                  onClick={() => setCourseSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
 
-                <div className="p-2.5 rounded-xl bg-surface-200/60 border border-white/5 text-xs text-gray-300 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-400 text-[11px]">Link do Google Drive:</span>
-                    <a
-                      href={c.driveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-indigo-400 hover:underline flex items-center gap-1 text-[11px] font-mono"
-                    >
-                      <span>Abrir</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-                  <p className="font-mono text-[11px] text-gray-400 truncate">{c.driveUrl}</p>
-                </div>
-
-                <div className="flex items-center justify-between pt-2">
+            {/* Segment Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap text-xs">
+              {[
+                { id: "todos", label: "Todos", count: courses.length },
+                { id: "fiscal", label: "🏛️ Fiscal", count: courses.filter(c => c.segment === "fiscal").length },
+                { id: "policial", label: "🛡️ Policial", count: courses.filter(c => c.segment === "policial").length },
+                { id: "tribunais", label: "⚖️ Tribunais & MP", count: courses.filter(c => c.segment === "tribunais").length },
+                { id: "administrativo", label: "🏢 Admin & Bancos", count: courses.filter(c => c.segment === "administrativo").length },
+                { id: "disciplinas", label: "⭐ Professores", count: courses.filter(c => c.segment === "disciplinas").length },
+              ].map((seg) => {
+                const isActive = courseSegmentFilter === seg.id;
+                return (
                   <button
-                    onClick={() => {
-                      updateCourse({ ...c, active: !c.active });
-                    }}
-                    className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition ${
-                      c.active ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300"
+                    key={seg.id}
+                    onClick={() => setCourseSegmentFilter(seg.id as any)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                      isActive
+                        ? "bg-red-600 text-white shadow-md shadow-red-600/30"
+                        : "bg-surface-200 text-gray-400 hover:text-white hover:bg-white/10"
                     }`}
                   >
-                    {c.active ? "Ativo no Site" : "Oculto"}
+                    <span>{seg.label}</span>
+                    <span className="text-[10px] opacity-75 font-mono">({seg.count})</span>
                   </button>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => openEditCourse(c)}
-                      className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-indigo-300 hover:text-white transition flex items-center gap-1 cursor-pointer"
-                    >
-                      <Edit3 className="w-3 h-3" /> Editar
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm(`Remover "${c.title}" do catálogo?`)) {
-                          deleteCourse(c.id);
-                        }
-                      }}
-                      className="p-1.5 rounded text-rose-400 hover:bg-rose-500/10 transition"
-                      title="Excluir curso"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
+
+          {/* Courses Grid */}
+          {(() => {
+            const filteredAdminCourses = courses.filter((c) => {
+              if (courseSegmentFilter !== "todos" && c.segment !== courseSegmentFilter) return false;
+              if (courseSearch.trim()) {
+                const q = courseSearch.toLowerCase().trim();
+                const inTitle = c.title.toLowerCase().includes(q);
+                const inSlug = c.slug.toLowerCase().includes(q);
+                const inPlatform = (c.platform || "").toLowerCase().includes(q);
+                const inDrive = (c.driveUrl || "").toLowerCase().includes(q);
+                if (!inTitle && !inSlug && !inPlatform && !inDrive) return false;
+              }
+              return true;
+            });
+
+            if (filteredAdminCourses.length === 0) {
+              return (
+                <div className="p-12 text-center rounded-2xl bg-surface-100/40 border border-white/5 space-y-3">
+                  <Search className="w-8 h-8 text-gray-500 mx-auto" />
+                  <p className="text-sm font-semibold text-white">Nenhum curso encontrado</p>
+                  <p className="text-xs text-gray-400">
+                    Não encontramos nenhum material com o termo &ldquo;{courseSearch}&rdquo;.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setCourseSearch("");
+                      setCourseSegmentFilter("todos");
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                  >
+                    Limpar Filtros
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredAdminCourses.map((c) => (
+                  <div key={c.id} className="p-5 rounded-2xl bg-surface-100/50 border border-white/5 hover:border-white/15 transition-all space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 uppercase">
+                            {c.segment}
+                          </span>
+                          {c.badge && (
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-red-500/20 text-red-300">
+                              {c.badge}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-bold text-white text-base mt-1.5 truncate" title={c.title}>
+                          {c.title}
+                        </h4>
+                        <p className="text-xs text-gray-400">{c.folderSize} • {c.platform}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-base font-black text-emerald-400 block">
+                          {formatCurrency(c.price)}
+                        </span>
+                        {c.originalPrice > c.price && (
+                          <span className="text-[11px] text-gray-500 line-through">
+                            {formatCurrency(c.originalPrice)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-surface-200/60 border border-white/5 text-xs text-gray-300 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400 text-[11px]">Link do Google Drive:</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleCopy(c.driveUrl, c.id);
+                              showToast(`Link do curso "${c.title}" copiado!`);
+                            }}
+                            className="text-gray-400 hover:text-white flex items-center gap-1 text-[11px] cursor-pointer"
+                          >
+                            <Copy className="w-3 h-3" />
+                            <span>{copiedId === c.id ? "Copiado!" : "Copiar"}</span>
+                          </button>
+                          <a
+                            href={c.driveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-[11px] font-mono"
+                          >
+                            <span>Abrir</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      </div>
+                      <p className="font-mono text-[11px] text-gray-400 truncate">{c.driveUrl}</p>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <button
+                        onClick={() => {
+                          const updated = { ...c, active: !c.active };
+                          updateCourse(updated);
+                          showToast(`Curso "${c.title}" agora está ${updated.active ? "visível" : "oculto"} no site.`);
+                        }}
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 ${
+                          c.active ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${c.active ? "bg-emerald-400" : "bg-rose-400"}`} />
+                        <span>{c.active ? "Ativo no Site" : "Oculto"}</span>
+                      </button>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEditCourse(c)}
+                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-indigo-300 hover:text-white transition flex items-center gap-1.5 cursor-pointer border border-white/5"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>Editar</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm(`Remover "${c.title}" do catálogo?`)) {
+                              deleteCourse(c.id);
+                              showToast(`Curso "${c.title}" removido com sucesso.`);
+                            }
+                          }}
+                          className="p-2 rounded-xl text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                          title="Excluir curso"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -901,29 +1048,68 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Preços e Valores com Suporte a Decimais e Vírgula (UI/UX Pro Max) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-2xl bg-neutral-900/60 border border-white/10">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Preço Promocional (R$)
+                  <label className="block text-xs font-semibold text-gray-200 mb-1.5 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <span className="text-emerald-400 font-bold">●</span>
+                      <span>Preço Promocional (R$) *</span>
+                    </span>
+                    {editForm?.price && parsePrice(editForm.price) > 0 && (
+                      <span className="text-xs font-bold text-emerald-400 font-mono">
+                        = {formatCurrency(parsePrice(editForm.price))}
+                      </span>
+                    )}
                   </label>
-                  <input
-                    type="number"
-                    value={editForm?.price || ""}
-                    onChange={(e) => handleEditChange("price", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs pointer-events-none">
+                      R$
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      required
+                      placeholder="Ex: 59,90"
+                      value={editForm?.price || ""}
+                      onChange={(e) => handleEditChange("price", e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-sm font-bold focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    />
+                  </div>
+                  <span className="text-[10px] text-gray-400 mt-1 block">
+                    Aceita vírgula ou ponto (ex: 59,90 ou 59.90)
+                  </span>
                 </div>
+
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Preço Original (R$)
+                  <label className="block text-xs font-semibold text-gray-200 mb-1.5 flex items-center justify-between">
+                    <span>Preço Original / De (R$)</span>
+                    {editForm?.originalPrice && parsePrice(editForm.originalPrice) > 0 && (
+                      <span className="text-xs font-medium text-gray-400 font-mono line-through">
+                        = {formatCurrency(parsePrice(editForm.originalPrice))}
+                      </span>
+                    )}
                   </label>
-                  <input
-                    type="number"
-                    value={editForm?.originalPrice || ""}
-                    onChange={(e) => handleEditChange("originalPrice", e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs pointer-events-none">
+                      R$
+                    </span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="Ex: 120,00"
+                      value={editForm?.originalPrice || ""}
+                      onChange={(e) => handleEditChange("originalPrice", e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-200 border border-white/10 text-white text-sm font-semibold focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    />
+                  </div>
+                  <span className="text-[10px] text-gray-400 mt-1 block">
+                    Valor cheio de referência tachado (ex: 120,00)
+                  </span>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-300 mb-1.5">
                     Tamanho da Pasta (ex: 140 GB)
@@ -937,7 +1123,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                    Total de Arquivos (ex: +1.400 Aulas)
+                    Total de Arquivos (ex: +1.400 Aulas & PDFs)
                   </label>
                   <input
                     type="text"
@@ -1369,6 +1555,21 @@ export default function AdminDashboardPage() {
             <p className="mb-1"><span className="font-bold text-white">Como funciona:</span> A lista é gerada automaticamente a partir dos pedidos feitos no site.</p>
             <p>Ao remover um aluno, todos os pedidos vinculados ao seu e-mail são excluídos juntamente com o cadastro.</p>
           </div>
+        </div>
+      )}
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-neutral-900/95 backdrop-blur-md border border-emerald-500/40 text-white shadow-2xl shadow-emerald-500/20 animate-fade-slide">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span className="text-xs font-semibold">{toastMessage}</span>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="ml-2 text-gray-400 hover:text-white p-1 rounded-lg transition"
+            aria-label="Fechar notificação"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
