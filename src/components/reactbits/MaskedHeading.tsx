@@ -655,3 +655,4 @@ export const MaskedHeading: React.FC<MaskedHeadingProps> = ({
 };
 
 export default MaskedHeading;
+

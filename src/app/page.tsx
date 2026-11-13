@@ -1,30 +1,23 @@
 "use client";
 
-import React from "react";
-import { TopBanner } from "@/components/TopBanner";
+import React, { useMemo } from "react";
 import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
 import { useStore } from "@/context/StoreContext";
 import { CheckoutModal } from "@/components/CheckoutModal";
-import { Testimonials } from "@/components/Testimonials";
-import { FaqSection } from "@/components/FaqSection";
 import Footer from "@/components/Footer";
-import {
-  FolderLock,
-  Clock,
-  CheckCircle2,
+import { 
+  Search, 
+  X, 
+  HardDrive, 
+  CheckCircle2, 
+  ShieldCheck, 
+  Clock, 
   Download,
-  ShieldCheck,
-  Star,
-  HardDrive,
-  Video,
-  Search,
-  Check,
-  Zap,
-  BookOpen,
-  ArrowRight
+  FolderOpen,
+  Sparkles
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { SegmentType } from "@/types";
 
 export default function HomePage() {
   const { 
@@ -36,352 +29,253 @@ export default function HomePage() {
     openCheckout 
   } = useStore();
 
-  // Filter courses by segment and search query
-  const filteredCourses = courses.filter((course) => {
-    if (!course.active) return false;
-    // Exclude any leftover combos
-    if (course.segment === ("combos" as any) || course.title.toLowerCase().startsWith("combo")) {
-      return false;
-    }
-    if (activeSegmentFilter !== "todos" && course.segment !== activeSegmentFilter) {
-      return false;
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      const inTitle = course.title.toLowerCase().includes(q);
-      const inDesc = course.description.toLowerCase().includes(q);
-      const inPlatform = course.platform.toLowerCase().includes(q);
-      if (!inTitle && !inDesc && !inPlatform) return false;
-    }
-    return true;
-  });
+  // Counts per segment
+  const counts = useMemo(() => {
+    const map: Record<string, number> = { todos: 0 };
+    courses.forEach((c) => {
+      if (!c.active) return;
+      map.todos = (map.todos || 0) + 1;
+      map[c.segment] = (map[c.segment] || 0) + 1;
+    });
+    return map;
+  }, [courses]);
 
-  const getAreaTitle = () => {
+  // Filter courses by segment and search query
+  const filteredCourses = useMemo(() => {
+    return courses.filter((course) => {
+      if (!course.active) return false;
+      if (activeSegmentFilter !== "todos" && course.segment !== activeSegmentFilter) {
+        return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const inTitle = course.title.toLowerCase().includes(q);
+        const inDesc = course.description?.toLowerCase().includes(q);
+        const inPlatform = course.platform?.toLowerCase().includes(q);
+        if (!inTitle && !inDesc && !inPlatform) return false;
+      }
+      return true;
+    });
+  }, [courses, activeSegmentFilter, searchQuery]);
+
+  const categories: { id: SegmentType | "todos"; label: string; icon: string }[] = [
+    { id: "todos", label: "Todos", icon: "📚" },
+    { id: "fiscal", label: "Fiscal & Tributário", icon: "🏛️" },
+    { id: "policial", label: "Carreiras Policiais", icon: "🛡️" },
+    { id: "tribunais", label: "Tribunais & MP", icon: "⚖️" },
+    { id: "administrativo", label: "Admin & Bancos", icon: "🏢" },
+    { id: "disciplinas", label: "Professores & Isoladas", icon: "⭐" },
+  ];
+
+  const getSectionTitle = () => {
     switch (activeSegmentFilter) {
       case "fiscal":
-        return "🏛️ Cursos da Área Fiscal & Tributária (Receita, SEFAZ, ISS)";
+        return "CURSOS • ÁREA FISCAL & TRIBUTÁRIA";
       case "policial":
-        return "🛡️ Cursos de Carreiras Policiais (PF, PRF, PC, Delegado)";
+        return "CURSOS • CARREIRAS POLICIAIS";
       case "tribunais":
-        return "⚖️ Cursos para Tribunais e Ministério Público (TRF, TRT, TJ, TRE)";
+        return "CURSOS • TRIBUNAIS E MINISTÉRIO PÚBLICO";
       case "administrativo":
-        return "🏢 Cursos da Área Administrativa & Bancária (CNU, BB, Caixa, INSS)";
+        return "CURSOS • ÁREA ADMINISTRATIVA E BANCÁRIA";
       case "disciplinas":
-        return "📚 Professores Renomados & Disciplinas Isoladas";
+        return "CURSOS • PROFESSORES E MATÉRIAS ISOLADAS";
       default:
-        return "Catálogo Completo de Materiais de Estudo";
-    }
-  };
-
-  const getBadgeStyle = (segment: string) => {
-    switch (segment) {
-      case "fiscal":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-      case "policial":
-        return "bg-sky-500/10 text-sky-400 border-sky-500/20";
-      case "tribunais":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
-      case "administrativo":
-        return "bg-purple-500/10 text-purple-400 border-purple-500/20";
-      case "disciplinas":
-        return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
-      default:
-        return "bg-slate-800 text-slate-300 border-slate-700";
-    }
-  };
-
-  const getAreaLabel = (segment: string) => {
-    switch (segment) {
-      case "fiscal":
-        return "Área Fiscal";
-      case "policial":
-        return "Carreira Policial";
-      case "tribunais":
-        return "Tribunais & MP";
-      case "administrativo":
-        return "Admin & Bancos";
-      case "disciplinas":
-        return "Professor VIP";
-      default:
-        return "Concurso 2026";
+        return "CURSOS";
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-white flex flex-col font-sans">
-      <TopBanner />
+    <div className="relative min-h-screen bg-[#050507] text-white flex flex-col font-sans selection:bg-red-600 selection:text-white">
+      
+      {/* Background Subtle SVG Grid from Fluxora */}
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.03]">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+                <path d="M48 0H0v48" fill="none" stroke="white" strokeWidth="0.5"></path>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)"></rect>
+          </svg>
+        </div>
+      </div>
+
+      {/* Cosmic Nebula Spiral & Galaxy Glow from Xinyu */}
+      <div className="cosmic-galaxy-bg" />
+      <div className="cosmic-nebula-spiral" />
+
+      {/* Top Navbar */}
       <Header />
-      <Hero />
 
-      {/* Trust & Guarantee Bar */}
-      <section className="py-8 border-b border-slate-800 bg-[#0E1526]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
-                <CheckCircle2 className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Google Drive Oficial</h4>
-                <p className="text-xs text-slate-400">Pastas compartilhadas no Gmail</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/20">
-                <Download className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Download 100% Liberado</h4>
-                <p className="text-xs text-slate-400">Assista online ou baixe aulas e PDFs</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/20">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Liberação em até 24h</h4>
-                <p className="text-xs text-slate-400">Envio pontual após o PIX</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/20">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Acesso Vitalício</h4>
-                <p className="text-xs text-slate-400">Sem mensalidades ou renovações</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Course Catalog Section */}
-      <main id="cursos" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+      {/* Main Showcase Section */}
+      <main className="relative z-10 flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-1.5">
-              Acervo Atualizado 2026
+        {/* Sleek Pill Announcement */}
+        <div className="w-fit mx-auto mb-6 animate-fade-slide">
+          <div className="inline-flex items-center gap-2 rounded-full border-gradient bg-white/5 px-3.5 py-1.5 text-xs text-neutral-300 backdrop-blur-md">
+            <span className="inline-flex items-center justify-center rounded-full bg-red-600/20 text-red-400 px-2 py-0.5 text-[11px] font-semibold">
+              Drive 2026
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              {getAreaTitle()}
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Selecione o seu curso e receba o convite de acesso compartilhado diretamente no seu Gmail.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
-              {filteredCourses.length} {filteredCourses.length === 1 ? "curso disponível" : "cursos disponíveis"}
-            </span>
+            <span className="font-medium">Pastas Oficiais no Google Drive • Envio Imediato no seu Gmail</span>
           </div>
         </div>
 
-        {/* Empty state when search returns zero */}
-        {filteredCourses.length === 0 ? (
-          <div className="text-center py-20 border border-slate-800 rounded-2xl bg-slate-900/40 p-8">
-            <div className="w-14 h-14 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-4 border border-slate-700">
-              <Search className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">Nenhum curso encontrado</h3>
-            <p className="text-sm text-slate-400 max-w-md mx-auto mb-6">
-              Não encontramos resultados para &ldquo;{searchQuery}&rdquo;. Tente buscar por outros termos como &ldquo;Receita&rdquo;, &ldquo;SEFAZ&rdquo;, &ldquo;TRF&rdquo; ou pelo nome do professor.
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setActiveSegmentFilter("todos");
-              }}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition cursor-pointer shadow-md"
-            >
-              Ver todos os cursos
-            </button>
+        {/* Clean Hero Search Header */}
+        <div className="text-center max-w-2xl mx-auto mb-8 animate-fade-slide">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            Central de Estudos
+          </h1>
+          <p className="mt-2 text-xs sm:text-sm text-neutral-400">
+            Encontre seu curso, selecione e finalize via PIX para liberação de acesso na sua conta Google.
+          </p>
+
+          {/* Clean Modern Search Bar */}
+          <div className="relative mt-6 max-w-xl mx-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Pesquisar por concurso, cargo ou professor (ex: SEFAZ, PF, Adriana)..."
+              className="w-full pl-11 pr-10 py-3 rounded-full bg-neutral-900/80 border border-white/10 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-white/30 focus:bg-neutral-900 transition-all shadow-lg backdrop-blur-md"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 rounded-full transition cursor-pointer"
+                aria-label="Limpar pesquisa"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        ) : (
-          /* Cards Grid - Colunas menores e mais compactas (4 colunas no desktop) */
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredCourses.map((course) => {
+
+          {/* Categories Filter Pills */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            {categories.map((cat) => {
+              const isActive = activeSegmentFilter === cat.id;
+              const count = counts[cat.id] || 0;
               return (
-                <div
-                  key={course.id}
-                  className="group rounded-2xl border border-slate-800 bg-[#111827] hover:border-slate-700 hover:shadow-xl transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveSegmentFilter(cat.id)}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                    isActive
+                      ? "bg-white text-black font-semibold shadow-md shadow-white/10"
+                      : "bg-white/5 text-neutral-300 hover:text-white hover:bg-white/10 border border-white/10"
+                  }`}
                 >
-                  <div className="p-4 sm:p-4.5">
-                    {/* Top tags row */}
-                    <div className="flex items-center justify-between gap-1.5 mb-2.5">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getBadgeStyle(course.segment)}`}>
-                        {getAreaLabel(course.segment)}
-                      </span>
-
-                      <span className="text-[10px] font-semibold text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700 truncate max-w-[140px]">
-                        {course.platform}
-                      </span>
-                    </div>
-
-                    {/* Course Title */}
-                    <h3 
-                      className="text-sm sm:text-[15px] font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug mb-1.5 line-clamp-2 min-h-[2.6rem]"
-                      title={course.title}
-                    >
-                      {course.title}
-                    </h3>
-
-                    {/* Short Description */}
-                    <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed mb-3">
-                      {course.shortDescription || course.description}
-                    </p>
-
-                    {/* Specs: Folder Size & Files */}
-                    <div className="grid grid-cols-2 gap-1.5 mb-3">
-                      <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-[10.5px] text-slate-300">
-                        <HardDrive className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span className="truncate">{course.folderSize}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-[10.5px] text-slate-300">
-                        <Video className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                        <span className="truncate">{course.totalFiles}</span>
-                      </div>
-                    </div>
-
-                    {/* Included Features Bullet Points */}
-                    <div className="space-y-1 mb-3 border-t border-slate-800/80 pt-2.5">
-                      {course.features.slice(0, 2).map((feat, i) => (
-                        <div key={i} className="flex items-start gap-1.5 text-[11px] text-slate-300">
-                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                          <span className="leading-tight line-clamp-1">{feat}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Delivery notice tag */}
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10.5px] font-medium text-emerald-400 mb-1">
-                      <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span className="truncate">Convite no seu Gmail em até 24h</span>
-                    </div>
-                  </div>
-
-                  {/* Card Footer: Pricing and CTA */}
-                  <div className="p-4 sm:p-4.5 pt-0 mt-auto">
-                    <div className="flex items-baseline justify-between mb-3 border-t border-slate-800/80 pt-2.5">
-                      <div>
-                        {course.originalPrice > course.price && (
-                          <span className="text-[10px] text-slate-500 line-through block">
-                            {formatCurrency(course.originalPrice)}
-                          </span>
-                        )}
-                        <span className="text-xl sm:text-2xl font-black text-white">
-                          {formatCurrency(course.price)}
-                        </span>
-                        <span className="text-[9.5px] text-slate-400 block font-medium">
-                          Pagamento único via PIX
-                        </span>
-                      </div>
-
-                      <div className="text-right">
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
-                          <Star className="w-2.5 h-2.5 fill-amber-400" />
-                          {course.rating || 4.9}
-                        </span>
-                        <span className="text-[9.5px] text-slate-400 block mt-0.5">
-                          {course.reviewsCount || 120} alunos
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* CTA Button */}
-                    <button
-                      onClick={() => openCheckout(course)}
-                      className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wide shadow-md shadow-emerald-900/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]"
-                    >
-                      <Zap className="w-3.5 h-3.5 fill-white" />
-                      <span>Comprar Acesso</span>
-                    </button>
-                  </div>
-
-                </div>
+                  <span>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                    isActive ? "bg-black/10 text-black font-bold" : "bg-white/10 text-neutral-400"
+                  }`}>
+                    {count}
+                  </span>
+                </button>
               );
             })}
           </div>
-        )}
+        </div>
+
+        {/* Courses Section (Xinyu List Layout) */}
+        <div className="mt-8 animate-fade-slide">
+          
+          {/* Section Bar */}
+          <div className="flex items-center justify-between mb-3 px-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+              {getSectionTitle()}
+            </span>
+            <span className="text-xs text-neutral-500 font-medium">
+              {filteredCourses.length} {filteredCourses.length === 1 ? "curso encontrado" : "cursos encontrados"}
+            </span>
+          </div>
+
+          {/* Empty State */}
+          {filteredCourses.length === 0 ? (
+            <div className="text-center py-16 px-4 rounded-2xl bg-neutral-900/60 border border-white/10 backdrop-blur-md">
+              <Search className="w-8 h-8 text-neutral-500 mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-white mb-1">Nenhum curso encontrado</h3>
+              <p className="text-xs text-neutral-400 max-w-sm mx-auto mb-5">
+                Não encontramos nenhum material correspondente à sua busca &ldquo;{searchQuery}&rdquo;.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveSegmentFilter("todos");
+                }}
+                className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition cursor-pointer shadow-md shadow-red-600/30"
+              >
+                Limpar filtros e ver todos
+              </button>
+            </div>
+          ) : (
+            /* Clean Table / List of Courses (Xinyu Style) */
+            <div className="bg-neutral-900/60 border border-white/10 rounded-2xl divide-y divide-white/5 backdrop-blur-md overflow-hidden shadow-2xl">
+              {filteredCourses.map((course) => {
+                const isCombo = course.title.toLowerCase().includes("combo");
+
+                return (
+                  <div
+                    key={course.id}
+                    className="flex items-center justify-between gap-3 sm:gap-4 p-4 hover:bg-white/[0.03] transition-colors group"
+                  >
+                    {/* Course Info */}
+                    <div 
+                      className="min-w-0 flex-1 cursor-pointer"
+                      onClick={() => openCheckout(course)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm sm:text-[15px] font-medium text-white group-hover:text-red-400 transition-colors truncate">
+                          {course.title}
+                        </h3>
+                      </div>
+                      
+                      <div className="flex items-center gap-2.5 mt-1">
+                        <span className="text-xs sm:text-sm font-semibold text-neutral-200">
+                          {formatCurrency(course.price)}
+                        </span>
+                        {course.originalPrice > course.price && (
+                          <span className="text-[11px] text-neutral-500 line-through">
+                            {formatCurrency(course.originalPrice)}
+                          </span>
+                        )}
+                        <span className="text-[11px] text-neutral-500 hidden sm:inline">
+                          • Google Drive Vitalício
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Side */}
+                    <div className="shrink-0 flex items-center gap-2.5">
+                      {isCombo && (
+                        <span className="text-[11px] font-semibold text-neutral-300 bg-white/10 px-3 py-1 rounded-full border border-white/10">
+                          Combo
+                        </span>
+                      )}
+
+                      <button
+                        onClick={() => openCheckout(course)}
+                        className="rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold text-xs sm:text-sm px-5 py-2 shadow-md shadow-red-600/30 transition-all active:scale-95 cursor-pointer flex items-center justify-center"
+                      >
+                        Comprar
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+        </div>
 
       </main>
 
-      {/* Benefits Section: Por que estudar com nossos drives? */}
-      <section id="como-funciona" className="py-14 border-t border-slate-800 bg-[#0E1526]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
-              Diferenciais do Nosso Acervo
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-3">
-              Por que estudar com os nossos drives?
-            </h3>
-            <p className="mt-2 text-sm text-slate-400">
-              Economize milhares de reais tendo acesso aos melhores materiais de concurso público do país.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/20">
-                <Clock className="w-5 h-5 text-emerald-400" />
-              </div>
-              <h3 className="text-base font-bold text-white mb-2">Envio no Gmail em até 24h</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Assim que o PIX é confirmado, adicionamos seu Gmail como participante com permissão total de acesso à pasta do curso.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20">
-                <Download className="w-5 h-5 text-indigo-400" />
-              </div>
-              <h3 className="text-base font-bold text-white mb-2">Download 100% Liberado</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Você pode assistir diretamente no Google Drive ou baixar as videoaulas em MP4 e PDFs para assistir offline no celular, tablet ou PC.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-4 border border-sky-500/20">
-                <HardDrive className="w-5 h-5 text-sky-400" />
-              </div>
-              <h3 className="text-base font-bold text-white mb-2">Organização Profissional</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Todas as disciplinas são estruturadas em pastas numeradas, com cronogramas, teoria completa, resumos esquematizados e questões comentadas.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4 border border-amber-500/20">
-                <ShieldCheck className="w-5 h-5 text-amber-400" />
-              </div>
-              <h3 className="text-base font-bold text-white mb-2">Pagamento Seguro via PIX</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Cobrança oficial processada pela VeloraPay com confirmação bancária imediata e emissão automática do registro do pedido.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <Testimonials />
-
-      {/* FAQ */}
-      <FaqSection />
-
-      {/* Footer */}
+      {/* Sleek Minimal Footer */}
       <Footer />
 
-      {/* Interactive Checkout Modal */}
+      {/* Checkout Modal */}
       <CheckoutModal />
     </div>
   );

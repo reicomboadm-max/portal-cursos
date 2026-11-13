@@ -138,48 +138,50 @@ export function CheckoutModal() {
     : "";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
       <div 
-        className="relative w-full max-w-lg bg-[#0c101d] border border-white/10 rounded-3xl shadow-2xl overflow-hidden my-8"
+        className="relative w-full max-w-lg bg-neutral-950 border border-white/10 rounded-2xl shadow-2xl overflow-hidden my-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="flex items-center justify-between p-5 sm:p-6 border-b border-white/10 bg-surface-100/50">
+        <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/[0.02]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-              <Lock className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center border border-white/10">
+              <Lock className="w-4 h-4 text-neutral-300" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-white">
-                {step === "form" ? "Checkout do Curso • Envio em até 24h" : "Pagamento do Pedido via PIX"}
+              <h2 className="text-base font-bold text-white">
+                {step === "form" ? "Checkout do Curso • Google Drive" : "Pagamento via PIX Instantâneo"}
               </h2>
-              <p className="text-xs text-gray-400">
-                {step === "form" ? "Preencha seu Gmail para receber o acesso ao Drive" : `Pedido: ${order?.id}`}
+              <p className="text-xs text-neutral-400">
+                {step === "form" ? "Informe seu Gmail para receber o acesso à pasta" : `Pedido: ${order?.id}`}
               </p>
             </div>
           </div>
           <button
             onClick={closeCheckout}
-            className="p-1.5 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition"
+            className="p-1.5 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Course Summary Banner */}
-        <div className="p-4 sm:p-5 bg-indigo-950/40 border-b border-indigo-500/20 flex items-center justify-between gap-3">
+        <div className="p-4 bg-white/[0.03] border-b border-white/10 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-300">Curso Escolhido</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Curso Selecionado</span>
             <p className="text-sm font-bold text-white truncate">{selectedCourseForCheckout.title}</p>
-            <p className="text-xs text-indigo-200">
+            <p className="text-xs text-neutral-400">
               {selectedCourseForCheckout.folderSize} • {selectedCourseForCheckout.platform}
             </p>
           </div>
           <div className="text-right shrink-0">
-            <span className="text-xs text-gray-400 line-through block">
-              {formatCurrency(selectedCourseForCheckout.originalPrice)}
-            </span>
-            <span className="text-xl font-black text-emerald-400">
+            {selectedCourseForCheckout.originalPrice > selectedCourseForCheckout.price && (
+              <span className="text-xs text-neutral-500 line-through block">
+                {formatCurrency(selectedCourseForCheckout.originalPrice)}
+              </span>
+            )}
+            <span className="text-xl font-black text-white">
               {formatCurrency(selectedCourseForCheckout.price)}
             </span>
           </div>
@@ -271,9 +273,9 @@ export function CheckoutModal() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="w-full py-3.5 px-4 rounded-full font-bold text-sm bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2 active:scale-95"
             >
-              <Zap className="w-4 h-4 fill-black" />
+              <Zap className="w-4 h-4 fill-white" />
               <span>{isLoading ? "Gerando Pedido PIX..." : "Gerar Chave e QR Code PIX"}</span>
             </button>
           </form>

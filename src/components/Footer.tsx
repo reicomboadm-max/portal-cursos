@@ -11,7 +11,7 @@ export default function Footer() {
   const whatsappUrl = `https://wa.me/${cleanWhatsappNumber}?text=Ol%C3%A1!%20Gostaria%20de%20tirar%20d%C3%BAvidas%20sobre%20os%20drives%20de%20cursos.`;
 
   return (
-    <footer className="border-t border-white/10 bg-[#060911] text-gray-400 text-sm">
+    <footer className="border-t border-white/10 bg-neutral-950 text-neutral-400 text-sm mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
