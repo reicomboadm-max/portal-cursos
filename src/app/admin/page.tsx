@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import { BrandLogo } from "@/components/BrandLogo";
+import { AdminAnalyticsDashboard } from "@/components/AdminAnalyticsDashboard";
 import { formatCurrency, formatDate, parsePrice, formatPriceNumber } from "@/lib/utils";
 import { Course, OrderStatus, SegmentType } from "@/types";
 import { 
@@ -29,7 +30,9 @@ import {
   Lock,
   ArrowLeft,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  LayoutDashboard,
+  BarChart3
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -53,7 +56,7 @@ export default function AdminDashboardPage() {
   const [adminPassInput, setAdminPassInput] = useState("");
   const [authError, setAuthError] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<"sales" | "courses" | "settings" | "clientes">("sales");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "sales" | "courses" | "settings" | "clientes">("dashboard");
   const [orderFilter, setOrderFilter] = useState<"ALL" | OrderStatus>("ALL");
   const [orderSearch, setOrderSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -398,63 +401,77 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* KPI Stats Cards (Minimal Tech) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
-          <div className="flex items-center justify-between text-emerald-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Faturamento Total</span>
-            <DollarSign className="w-4 h-4" />
+      {/* KPI Stats Cards (Minimal Tech) - Exibido apenas fora da Dashboard Principal */}
+      {activeTab !== "dashboard" && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
+            <div className="flex items-center justify-between text-emerald-400 mb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Faturamento Total</span>
+              <DollarSign className="w-4 h-4" />
+            </div>
+            <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
+              {formatCurrency(totalRevenue)}
+            </span>
+            <p className="text-[11px] text-emerald-400 font-medium mt-1">
+              Total recebido via PIX
+            </p>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
-            {formatCurrency(totalRevenue)}
-          </span>
-          <p className="text-[11px] text-emerald-400 font-medium mt-1">
-            Total recebido via PIX
-          </p>
-        </div>
 
-        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
-          <div className="flex items-center justify-between text-red-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Vendas Pagas</span>
-            <ShoppingBag className="w-4 h-4" />
+          <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
+            <div className="flex items-center justify-between text-red-400 mb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Vendas Pagas</span>
+              <ShoppingBag className="w-4 h-4" />
+            </div>
+            <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
+              {paidOrders.length}
+            </span>
+            <p className="text-[11px] text-neutral-400 font-medium mt-1">
+              Drives liberados
+            </p>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
-            {paidOrders.length}
-          </span>
-          <p className="text-[11px] text-neutral-400 font-medium mt-1">
-            Drives liberados
-          </p>
-        </div>
 
-        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
-          <div className="flex items-center justify-between text-amber-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">PIX Pendentes</span>
-            <Clock className="w-4 h-4" />
+          <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
+            <div className="flex items-center justify-between text-amber-400 mb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">PIX Pendentes</span>
+              <Clock className="w-4 h-4" />
+            </div>
+            <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
+              {pendingOrders.length}
+            </span>
+            <p className="text-[11px] text-amber-400 font-medium mt-1">
+              Aguardando pagamento
+            </p>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
-            {pendingOrders.length}
-          </span>
-          <p className="text-[11px] text-amber-400 font-medium mt-1">
-            Aguardando pagamento
-          </p>
-        </div>
 
-        <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
-          <div className="flex items-center justify-between text-neutral-300 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Ticket Médio</span>
-            <TrendingUp className="w-4 h-4" />
+          <div className="p-5 rounded-2xl bg-[#0c101a]/90 border border-white/[0.08] hover:border-white/20 transition-all shadow-xl backdrop-blur-md">
+            <div className="flex items-center justify-between text-neutral-300 mb-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Ticket Médio</span>
+              <TrendingUp className="w-4 h-4" />
+            </div>
+            <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
+              {formatCurrency(averageTicket)}
+            </span>
+            <p className="text-[11px] text-neutral-400 font-medium mt-1">
+              Por aluno aprovado
+            </p>
           </div>
-          <span className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
-            {formatCurrency(averageTicket)}
-          </span>
-          <p className="text-[11px] text-neutral-400 font-medium mt-1">
-            Por aluno aprovado
-          </p>
         </div>
-      </div>
+      )}
 
       {/* Navigation Tabs (Minimal Tech) */}
       <div className="flex border-b border-white/10 gap-3 mb-6 overflow-x-auto no-scrollbar">
+        <button
+          onClick={() => setActiveTab("dashboard")}
+          className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition cursor-pointer ${
+            activeTab === "dashboard"
+              ? "border-red-500 text-white shadow-[0_1px_10px_rgba(239,68,68,0.4)]"
+              : "border-transparent text-neutral-400 hover:text-white"
+          }`}
+        >
+          <LayoutDashboard className={`w-4 h-4 ${activeTab === "dashboard" ? "text-red-400" : "text-neutral-400"}`} />
+          <span>Dashboard & Telemetria</span>
+        </button>
+
         <button
           onClick={() => setActiveTab("sales")}
           className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition cursor-pointer ${
@@ -503,6 +520,17 @@ export default function AdminDashboardPage() {
           <span>Clientes & Alunos</span>
         </button>
       </div>
+
+      {/* TAB 0: REALTIME ANALYTICS DASHBOARD */}
+      {activeTab === "dashboard" && (
+        <AdminAnalyticsDashboard
+          orders={orders}
+          courses={courses}
+          onRefresh={() => {
+            // Dashboard auto-refreshes every 15s or on manual trigger
+          }}
+        />
+      )}
 
       {/* TAB 1: SALES & ORDERS */}
       {activeTab === "sales" && (

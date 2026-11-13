@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useStore } from "@/context/StoreContext";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getStateFromDdd } from "@/lib/utils";
 import { Order } from "@/types";
 import { 
   X, 

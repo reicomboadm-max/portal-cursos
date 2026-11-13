@@ -10,6 +10,43 @@ export function AnalyticsTracker() {
   const gaId = settings.googleAnalyticsId?.trim();
   const pixelId = settings.facebookPixelId?.trim();
 
+  // Internal real-time visitor telemetry
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      let sessionId = sessionStorage.getItem("_cda_sid");
+      if (!sessionId) {
+        sessionId = `sid_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+        sessionStorage.setItem("_cda_sid", sessionId);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const utmSource = params.get("utm_source") || (document.referrer.includes("t.me") ? "Telegram" : document.referrer.includes("google") ? "Google Search" : document.referrer ? "Referrer Externo" : "Direto / Orgânico");
+
+      const payload = {
+        path: window.location.pathname,
+        referrer: document.referrer || undefined,
+        utmSource,
+        sessionId,
+      };
+
+      // Use sendBeacon if available, otherwise fetch
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon("/api/analytics/track", JSON.stringify(payload));
+      } else {
+        fetch("/api/analytics/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        }).catch(() => {});
+      }
+    } catch {
+      // Ignora silenciosamente se o navegador bloquear cookies/armazenamento
+    }
+  }, []);
+
   return (
     <>
       {/* Google Analytics 4 (GA4) */}

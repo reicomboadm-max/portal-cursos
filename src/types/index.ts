@@ -49,6 +49,30 @@ export interface Order {
   deliveredAt?: string;
   deliveryEstimatedMax?: string; // Data limite (24h)
   veloraTransactionId?: string;
+  studentState?: string; // UF (ex: "DF", "SP", "RJ", "MG")
+  studentCity?: string;
+  utmSource?: string;
+}
+
+export interface VisitorEvent {
+  path: string;
+  state?: string;
+  city?: string;
+  device: "mobile" | "desktop" | "tablet";
+  utmSource?: string;
+  referrer?: string;
+  timestamp: string;
+}
+
+export interface AnalyticsStats {
+  todayVisits: number;
+  yesterdayVisits: number;
+  totalVisits: number;
+  uniqueVisitors: number;
+  visitsByHour: Record<string, number>;
+  visitsByState: Record<string, number>;
+  visitsByUtm: Record<string, number>;
+  recentEvents: VisitorEvent[];
 }
 
 export interface StudentUser {
