@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { useStore } from "@/context/StoreContext";
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { FluxoraBackground } from "@/components/FluxoraBackground";
-import StarBorder from "@/components/reactbits/StarBorder";
 import GooeyNav from "@/components/reactbits/GooeyNav";
 import Footer from "@/components/Footer";
 import { FAQ } from "@/components/FAQ";
@@ -15,7 +14,7 @@ import {
   Sparkles,
   ShieldCheck,
   CheckCircle2,
-  HardDrive
+  ChevronDown
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { SegmentType } from "@/types";
@@ -29,6 +28,12 @@ export default function HomePage() {
     setSearchQuery,
     openCheckout 
   } = useStore();
+
+  const [visibleCount, setVisibleCount] = useState(25);
+
+  useEffect(() => {
+    setVisibleCount(25);
+  }, [activeSegmentFilter, searchQuery]);
 
   // Counts per segment
   const counts = useMemo(() => {
@@ -58,6 +63,14 @@ export default function HomePage() {
       return true;
     });
   }, [courses, activeSegmentFilter, searchQuery]);
+
+  // Progressive rendering for mobile performance (renders first batch instantly)
+  const displayedCourses = useMemo(() => {
+    if (searchQuery.trim()) {
+      return filteredCourses;
+    }
+    return filteredCourses.slice(0, visibleCount);
+  }, [filteredCourses, searchQuery, visibleCount]);
 
   const categories: { id: SegmentType | "todos"; label: string; icon: string }[] = useMemo(() => [
     { id: "todos", label: "Todos", icon: "📚" },
@@ -157,8 +170,31 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Categories Filter (GooeyNav React Bits) */}
-          <div className="mt-6 flex justify-center max-w-full overflow-x-auto py-2">
+          {/* Categories Filter: Mobile-optimized native swipe bar (sm:hidden) + GooeyNav on desktop */}
+          <div className="mt-6 flex sm:hidden overflow-x-auto gap-2 py-2 no-scrollbar px-1">
+            {categories.map((cat) => {
+              const isActive = activeSegmentFilter === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveSegmentFilter(cat.id)}
+                  className={`px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    isActive
+                      ? "bg-red-600 text-white shadow-md shadow-red-600/30"
+                      : "bg-neutral-900/80 text-neutral-300 hover:text-white border border-white/10"
+                  }`}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{cat.label}</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${isActive ? "bg-white/20 text-white" : "bg-white/10 text-neutral-400"}`}>
+                    {counts[cat.id] || 0}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 hidden sm:flex justify-center max-w-full overflow-x-auto py-2">
             <GooeyNav
               items={gooeyItems}
               activeIndex={activeCategoryIndex}
@@ -173,7 +209,7 @@ export default function HomePage() {
               activeTextColor="#000000"
               colors={["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#a855f7"]}
               frame={true}
-              particleCount={15}
+              particleCount={10}
               spread={48}
               animationTime={600}
               timeVariance={300}
@@ -216,75 +252,79 @@ export default function HomePage() {
               </button>
             </div>
           ) : (
-            /* Clean Table / List of Courses (Xinyu Style) */
-            <div className="bg-neutral-900/60 border border-white/10 rounded-2xl divide-y divide-white/5 backdrop-blur-md overflow-hidden shadow-2xl">
-              {filteredCourses.map((course) => {
-                const isCombo = course.title.toLowerCase().includes("combo");
+            /* Clean Table / List of Courses (Xinyu Style, Hardware-Accelerated) */
+            <>
+              <div className="bg-neutral-900/60 border border-white/10 rounded-2xl divide-y divide-white/5 backdrop-blur-md overflow-hidden shadow-2xl">
+                {displayedCourses.map((course) => {
+                  const isCombo = course.title.toLowerCase().includes("combo");
 
-                return (
-                  <div
-                    key={course.id}
-                    className="flex items-center justify-between gap-3 sm:gap-4 p-4 hover:bg-white/[0.03] transition-colors group"
-                  >
-                    {/* Course Info */}
-                    <div 
-                      className="min-w-0 flex-1 cursor-pointer"
-                      onClick={() => openCheckout(course)}
+                  return (
+                    <div
+                      key={course.id}
+                      style={{ contentVisibility: "auto", containIntrinsicSize: "0 68px" }}
+                      className="flex items-center justify-between gap-3 sm:gap-4 p-4 hover:bg-white/[0.03] transition-colors group"
                     >
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm sm:text-[15px] font-medium text-white group-hover:text-red-400 transition-colors truncate">
-                          {course.title}
-                        </h3>
+                      {/* Course Info */}
+                      <div 
+                        className="min-w-0 flex-1 cursor-pointer"
+                        onClick={() => openCheckout(course)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm sm:text-[15px] font-medium text-white group-hover:text-red-400 transition-colors truncate">
+                            {course.title}
+                          </h3>
+                        </div>
+                        
+                        <div className="flex items-center gap-2.5 mt-1">
+                          <span className="text-xs sm:text-sm font-semibold text-neutral-200">
+                            {formatCurrency(course.price)}
+                          </span>
+                          {course.originalPrice > course.price && (
+                            <span className="text-[11px] text-neutral-500 line-through">
+                              {formatCurrency(course.originalPrice)}
+                            </span>
+                          )}
+                          <span className="text-[11px] text-neutral-500 hidden sm:inline">
+                            • Google Drive Vitalício
+                          </span>
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center gap-2.5 mt-1">
-                        <span className="text-xs sm:text-sm font-semibold text-neutral-200">
-                          {formatCurrency(course.price)}
-                        </span>
-                        {course.originalPrice > course.price && (
-                          <span className="text-[11px] text-neutral-500 line-through">
-                            {formatCurrency(course.originalPrice)}
+
+                      {/* Action Side */}
+                      <div className="shrink-0 flex items-center gap-2.5">
+                        {isCombo && (
+                          <span className="text-[11px] font-semibold text-neutral-300 bg-white/10 px-3 py-1 rounded-full border border-white/10">
+                            Combo
                           </span>
                         )}
-                        <span className="text-[11px] text-neutral-500 hidden sm:inline">
-                          • Google Drive Vitalício
-                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => openCheckout(course)}
+                          className="px-4 sm:px-5 py-2 rounded-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs sm:text-sm font-semibold shadow-md shadow-red-600/30 transition-transform active:scale-95 cursor-pointer flex items-center justify-center shrink-0 border border-red-500/50"
+                        >
+                          Adquirir
+                        </button>
                       </div>
                     </div>
+                  );
+                })}
+              </div>
 
-                    {/* Action Side */}
-                    <div className="shrink-0 flex items-center gap-2.5">
-                      {isCombo && (
-                        <span className="text-[11px] font-semibold text-neutral-300 bg-white/10 px-3 py-1 rounded-full border border-white/10">
-                          Combo
-                        </span>
-                      )}
-
-                      <StarBorder
-                        onClick={() => openCheckout(course)}
-                        color="#ffffff"
-                        trailColor="#ef4444"
-                        duration={3.5}
-                        direction="clockwise"
-                        stars={1}
-                        trailLength={0.35}
-                        thickness={1.5}
-                        radius={9999}
-                        glow={0.7}
-                        hover="lap"
-                        sparkle={true}
-                        clickPulse={true}
-                        backgroundColor="#dc2626"
-                        textColor="#ffffff"
-                        className="text-xs sm:text-sm font-semibold px-5 py-2 shadow-md shadow-red-600/30 transition-all active:scale-95 cursor-pointer flex items-center justify-center"
-                      >
-                        Adquirir
-                      </StarBorder>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+              {/* Load More Button for Mobile & Long Catalog Browsing */}
+              {!searchQuery.trim() && visibleCount < filteredCourses.length && (
+                <div className="text-center mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((prev) => prev + 25)}
+                    className="px-6 py-3 rounded-2xl bg-neutral-900/90 hover:bg-neutral-800 text-neutral-200 hover:text-white border border-white/10 text-xs font-semibold transition active:scale-95 cursor-pointer shadow-lg inline-flex items-center gap-2"
+                  >
+                    <span>Carregar mais cursos ({filteredCourses.length - visibleCount} restantes)</span>
+                    <ChevronDown className="w-4 h-4 text-neutral-400" />
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
         </div>
