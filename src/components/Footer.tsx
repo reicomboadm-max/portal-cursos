@@ -19,12 +19,12 @@ export default function Footer() {
           {/* Column 1: Brand */}
           <div className="space-y-4 md:col-span-1">
             <div className="flex items-center gap-3">
-              <BrandLogo size={40} />
+              <BrandLogo size={46} />
               <div className="flex flex-col">
-                <span className="font-extrabold text-base text-white tracking-tight">
-                  Central do <span className="text-red-500">Aprovado</span>
+                <span className="font-black text-lg text-white tracking-tight">
+                  CENTRAL DO <span className="text-red-500">APROVADO</span>
                 </span>
-                <span className="text-[10px] text-neutral-400 font-mono">centraldoaprovado.com.br</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Cursos & Drives</span>
               </div>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">

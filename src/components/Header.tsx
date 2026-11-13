@@ -35,17 +35,19 @@ export function Header() {
           onClick={() => setActiveSegmentFilter("todos")}
           className="flex items-center gap-3 group cursor-pointer"
         >
-          <BrandLogo size={38} />
+          <BrandLogo size={46} />
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-bold tracking-tight text-white group-hover:text-red-400 transition">
-                Central do <span className="text-red-500 font-extrabold">Aprovado</span>
+              <span className="text-base sm:text-xl font-black tracking-tight text-white group-hover:text-red-400 transition">
+                CENTRAL DO <span className="text-red-500">APROVADO</span>
               </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-300">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-300">
                 DRIVE 2026
               </span>
             </div>
-            <span className="text-[10px] text-neutral-400 hidden sm:block">centraldoaprovado.com.br • Google Drive</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400 hidden sm:block">
+              Cursos & Drives Oficiais
+            </span>
           </div>
         </Link>
 
