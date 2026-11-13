@@ -1297,7 +1297,7 @@ export default function AdminDashboardPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1">Canal Oficial Telegram</label>
+              <label className="block text-xs font-semibold text-gray-300 mb-1">Telegram de Suporte 2 (Combo Rei)</label>
               <input
                 type="text"
                 value={localSettings.telegramChannel || "https://t.me/comboreiboss"}

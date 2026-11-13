@@ -69,7 +69,7 @@ export default function Footer() {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-semibold transition border border-blue-500/30"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>Canal Telegram</span>
+              <span>Suporte Combo Rei</span>
             </a>
           </div>
 

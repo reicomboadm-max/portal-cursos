@@ -71,10 +71,10 @@ export function Header() {
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:inline-flex items-center gap-1.5 rounded-full border-gradient bg-white/5 backdrop-blur-xl px-3.5 py-2 text-xs sm:text-sm font-medium text-sky-400 hover:text-sky-300 hover:bg-sky-500/10 transition"
-            title="Canal Telegram"
+            title="Suporte Combo Rei no Telegram"
           >
             <Send className="w-3.5 h-3.5 text-sky-400" />
-            <span>Canal Telegram</span>
+            <span>Suporte Combo Rei</span>
           </a>
 
           <a

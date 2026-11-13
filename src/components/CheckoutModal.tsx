@@ -421,7 +421,7 @@ export function CheckoutModal() {
                     className="w-full py-2.5 px-3 rounded-xl text-xs font-semibold text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 transition flex items-center justify-center gap-1.5"
                   >
                     <Send className="w-4 h-4 text-blue-400" />
-                    <span>Canal no Telegram</span>
+                    <span>Suporte Combo Rei</span>
                   </a>
                 </div>
 

@@ -65,10 +65,10 @@ export function FloatingSupportWidget() {
             >
               <div className="flex items-center gap-2">
                 <Send className="w-4 h-4 text-blue-400 group-hover:scale-110 transition" />
-                <span>Canal Oficial Telegram</span>
+                <span>Suporte: Combo Rei</span>
               </div>
               <span className="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">
-                Canal VIP
+                Atendimento
               </span>
             </a>
           </div>
