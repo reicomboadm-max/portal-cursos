@@ -14,6 +14,7 @@ import {
   MessageCircle, 
   GraduationCap
 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export function Header() {
   const pathname = usePathname();
@@ -32,21 +33,19 @@ export function Header() {
         <Link 
           href="/" 
           onClick={() => setActiveSegmentFilter("todos")}
-          className="flex items-center gap-3 group"
+          className="flex items-center gap-3 group cursor-pointer"
         >
-          <span className="inline-flex items-center justify-center bg-white/10 w-9 h-9 rounded-full backdrop-blur border-gradient">
-            <FolderLock className="w-4 h-4 text-white group-hover:text-red-400 transition" />
-          </span>
+          <BrandLogo size={38} />
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-base sm:text-lg font-bold tracking-tight text-white group-hover:text-neutral-200 transition">
-                {settings.siteName || "DriveConcursos"}
+              <span className="text-base sm:text-lg font-bold tracking-tight text-white group-hover:text-red-400 transition">
+                Central do <span className="text-red-500 font-extrabold">Aprovado</span>
               </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-neutral-300">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-300">
                 DRIVE 2026
               </span>
             </div>
-            <span className="text-[10px] text-neutral-400 hidden sm:block">Central de Estudos • Google Drive</span>
+            <span className="text-[10px] text-neutral-400 hidden sm:block">centraldoaprovado.com.br • Google Drive</span>
           </div>
         </Link>
 

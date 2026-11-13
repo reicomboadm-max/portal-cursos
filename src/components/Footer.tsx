@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { FolderLock, ShieldCheck, MessageCircle, Send } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default function Footer() {
   const { settings, setActiveSegmentFilter } = useStore();
@@ -18,14 +19,13 @@ export default function Footer() {
           {/* Column 1: Brand */}
           <div className="space-y-4 md:col-span-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 p-[1.5px] shadow-lg shadow-indigo-500/20">
-                <div className="w-full h-full bg-[#0b0f19] rounded-[10px] flex items-center justify-center">
-                  <FolderLock className="w-5 h-5 text-indigo-400" />
-                </div>
+              <BrandLogo size={40} />
+              <div className="flex flex-col">
+                <span className="font-extrabold text-base text-white tracking-tight">
+                  Central do <span className="text-red-500">Aprovado</span>
+                </span>
+                <span className="text-[10px] text-neutral-400 font-mono">centraldoaprovado.com.br</span>
               </div>
-              <span className="font-extrabold text-lg text-white tracking-tight">
-                {settings.siteName}
-              </span>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
               O maior acervo de pastas e materiais de concursos públicos do Brasil no Google Drive. Videoaulas, PDFs e resumos com download 100% liberado.
