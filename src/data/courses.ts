@@ -1,7 +1,7 @@
 import { Course, SiteSettings, Order } from "@/types";
 
 export const initialSiteSettings: SiteSettings = {
-  siteName: "DriveConcursos VIP",
+  siteName: "Central do Aprovado",
   tagline: "Pastas organizadas no Google Drive com videoaulas e PDFs para concursos públicos",
   adminEmails: ["reicomboadm@gmail.com", "gptdoscriasstpg@gmail.com"],
   pixKey: "pix@driveconcursos.com",

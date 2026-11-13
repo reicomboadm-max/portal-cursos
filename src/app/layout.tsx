@@ -4,7 +4,7 @@ import { StoreProvider } from "@/context/StoreContext";
 import { FloatingSupportWidget } from "@/components/FloatingSupportWidget";
 
 export const metadata: Metadata = {
-  title: "DriveConcursos • Central de Estudos & Cursos Google Drive",
+  title: "Central do Aprovado • Cursos & Materiais Google Drive",
   description: "Cursos e materiais completos para concursos públicos com acesso compartilhado no Google Drive.",
 };
 
