@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { useStore } from "@/context/StoreContext";
 import { CheckoutModal } from "@/components/CheckoutModal";
 import { FluxoraBackground } from "@/components/FluxoraBackground";
+import StarBorder from "@/components/reactbits/StarBorder";
 import Footer from "@/components/Footer";
 import { 
   Search, 
@@ -238,12 +239,26 @@ export default function HomePage() {
                         </span>
                       )}
 
-                      <button
+                      <StarBorder
                         onClick={() => openCheckout(course)}
-                        className="rounded-full bg-red-600 hover:bg-red-500 text-white font-semibold text-xs sm:text-sm px-5 py-2 shadow-md shadow-red-600/30 transition-all active:scale-95 cursor-pointer flex items-center justify-center"
+                        color="#ffffff"
+                        trailColor="#ef4444"
+                        duration={3.5}
+                        direction="clockwise"
+                        stars={1}
+                        trailLength={0.35}
+                        thickness={1.5}
+                        radius={9999}
+                        glow={0.7}
+                        hover="lap"
+                        sparkle={true}
+                        clickPulse={true}
+                        backgroundColor="#dc2626"
+                        textColor="#ffffff"
+                        className="text-xs sm:text-sm font-semibold px-5 py-2 shadow-md shadow-red-600/30 transition-all active:scale-95 cursor-pointer flex items-center justify-center"
                       >
-                        Comprar
-                      </button>
+                        Adquirir
+                      </StarBorder>
                     </div>
                   </div>
                 );
